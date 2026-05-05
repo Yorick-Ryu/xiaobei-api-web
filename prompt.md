@@ -1,7 +1,7 @@
 为"小北科研API"创建一个中文落地页，内容如下：
 
 **网站名称：** 小北科研API
-**定位：** Claude 与 ChatGPT API 中转站，面向研究生、博士生和科研工作者
+**定位：** Claude 与 GPT API 中转站，面向研究生、博士生和科研工作者
 
 ---
 
@@ -13,7 +13,7 @@
 ---
 
 **Hero 区块**
-- 小标题（eyebrow）：Claude 与 ChatGPT API 中转站
+- 小标题（eyebrow）：Claude 与 GPT API 中转站
 - 主标题：小北科研API
 - 副文案：为研究生、博士生和科研工作者准备的 AI API relay：支持 Claude，也支持 ChatGPT / Codex。百分百满血、不降智、稳定高速，适合科研写作、代码、数据分析和文献处理。
 - 特点标签：满血模型能力 / 稳定高速转发 / 科研工作流友好
