@@ -499,6 +499,11 @@
       text-align: center;
       border: 1.5px solid transparent;
     }
+    button.price-badge {
+      font-family: var(--sans);
+      background: none;
+      cursor: pointer;
+    }
     .pb-link    { background: var(--ink); color: var(--bg); }
     .pb-rec     { background: var(--accent-bg); color: var(--accent); border-color: oklch(from var(--accent) l c h / 0.3); }
     .pb-consult { border-color: var(--line); color: var(--ink-2); }
@@ -839,6 +844,7 @@
       <p class="section-body">我们的缓存命中率高达 90%，命中缓存的部分仅按原价 1 折收费。正常使用情况下，0.5 RMB = 1 美金 = 约 300 万 GPT-5.5 Token。</p>
       <div class="btn-row">
         <a class="btn btn-primary" href="https://beiapi.cn/sign-in">立即接入</a>
+        <a class="btn btn-outline" href="https://pay.ldxp.cn/shop/xiaobeiapi">购买套餐</a>
         <button class="btn btn-tinted" data-open-modal aria-haspopup="dialog" aria-controls="community-modal">加入社群</button>
       </div>
     </div>
@@ -858,27 +864,27 @@
         </div>
       </div>
       <div class="price-list">
-      <div class="price-tier">
-        <div>
-          <p class="price-name">入门体验</p>
-          <p class="price-desc">适合先测试 Claude / ChatGPT API 接入、验证速度与稳定性。</p>
+        <div class="price-tier">
+          <div>
+            <p class="price-name">入门体验</p>
+            <p class="price-desc">适合先测试 Claude / ChatGPT API 接入、验证速度与稳定性。</p>
+          </div>
+          <a class="price-badge pb-link" href="https://pay.ldxp.cn/shop/xiaobeiapi">查看套餐</a>
         </div>
-        <a class="price-badge pb-link" href="https://pay.ldxp.cn/shop/xiaobeiapi">查看套餐</a>
-      </div>
-      <div class="price-tier">
-        <div>
-          <p class="price-name">科研高频</p>
-          <p class="price-desc">适合日常论文写作、代码调试、文献处理等持续任务。</p>
+        <div class="price-tier">
+          <div>
+            <p class="price-name">科研高频</p>
+            <p class="price-desc">适合日常论文写作、代码调试、文献处理等持续任务。</p>
+          </div>
+          <span class="price-badge pb-rec">推荐</span>
         </div>
-        <span class="price-badge pb-rec">推荐</span>
-      </div>
-      <div class="price-tier">
-        <div>
-          <p class="price-name">团队协作</p>
-          <p class="price-desc">适合课题组、实验室或多项目并行的 API 使用需求。</p>
+        <div class="price-tier">
+          <div>
+            <p class="price-name">团队协作</p>
+            <p class="price-desc">适合课题组、实验室或多项目并行的 API 使用需求。</p>
+          </div>
+          <button class="price-badge pb-consult" data-open-modal aria-haspopup="dialog" aria-controls="community-modal">咨询</button>
         </div>
-        <span class="price-badge pb-consult">咨询</span>
-      </div>
       </div>
       <p class="price-note">实际消耗会随模型、上下文长度、缓存命中情况和任务类型变化，充值前可先小额测试。</p>
     </div>
