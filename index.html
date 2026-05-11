@@ -455,6 +455,41 @@
       margin-bottom: 4px;
     }
     .price-desc { color: var(--ink-2); font-size: 13.5px; line-height: 1.6; }
+    .price-note {
+      margin-top: 18px;
+      color: var(--ink-2);
+      font-size: 14px;
+      line-height: 1.8;
+    }
+    .price-facts {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--line);
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      overflow: hidden;
+      margin-bottom: 14px;
+    }
+    .price-fact {
+      background: var(--bg);
+      padding: 18px;
+    }
+    .price-fact strong {
+      display: block;
+      font-family: var(--serif);
+      font-size: clamp(22px, 3vw, 30px);
+      font-weight: 700;
+      color: var(--accent);
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+    .price-fact span {
+      display: block;
+      color: var(--ink-2);
+      font-size: 12.5px;
+      line-height: 1.55;
+    }
     .price-badge {
       padding: 7px 13px;
       border-radius: var(--r);
@@ -631,6 +666,7 @@
       .step-body { grid-column: 2; }
       .step-num { font-size: 26px; }
       .trust-metrics { grid-template-columns: 1fr; }
+      .price-facts { grid-template-columns: 1fr; }
       .price-tier { grid-template-columns: 1fr; }
       .hero-meta { grid-template-columns: 1fr; }
       .footer-inner { flex-direction: column; align-items: flex-start; }
@@ -799,14 +835,29 @@
   <div class="wrap pricing-inner">
     <div>
       <p class="kicker">Pricing</p>
-      <h2 class="section-title" id="pricing-title">按科研使用节奏选择套餐。</h2>
-      <p class="section-body">套餐信息保持清晰透明，适合先小规模接入验证，再扩展到论文写作、代码开发和数据分析等稳定工作流。</p>
+      <h2 class="section-title" id="pricing-title">缓存命中后，科研 API 成本会明显降下来。</h2>
+      <p class="section-body">我们的缓存命中率高达 90%，命中缓存的部分仅按原价 1 折收费。正常使用情况下，0.5 RMB = 1 美金 = 约 300 万 GPT-5.5 Token。</p>
       <div class="btn-row">
         <a class="btn btn-primary" href="https://beiapi.cn/sign-in">立即接入</a>
         <button class="btn btn-tinted" data-open-modal aria-haspopup="dialog" aria-controls="community-modal">加入社群</button>
       </div>
     </div>
-    <div class="price-list">
+    <div>
+      <div class="price-facts" aria-label="价格优势">
+        <div class="price-fact">
+          <strong>90%</strong>
+          <span>缓存命中率高，重复上下文和高频任务更省。</span>
+        </div>
+        <div class="price-fact">
+          <strong>1 折</strong>
+          <span>命中缓存的 Token 仅按原价十分之一计费。</span>
+        </div>
+        <div class="price-fact">
+          <strong>300 万</strong>
+          <span>正常使用下，0.5 RMB 约等于 300 万 GPT-5.5 Token。</span>
+        </div>
+      </div>
+      <div class="price-list">
       <div class="price-tier">
         <div>
           <p class="price-name">入门体验</p>
@@ -828,6 +879,8 @@
         </div>
         <span class="price-badge pb-consult">咨询</span>
       </div>
+      </div>
+      <p class="price-note">实际消耗会随模型、上下文长度、缓存命中情况和任务类型变化，充值前可先小额测试。</p>
     </div>
   </div>
 </section>
