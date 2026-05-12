@@ -8,45 +8,39 @@
   <style>
     /* ── Tokens ── */
     :root {
-      --bg:        oklch(97.2% 0.008 62);
-      --bg-2:      oklch(94%   0.011 62);
-      --bg-3:      oklch(90%   0.013 62);
-      --ink:       oklch(16%   0.014 52);
-      --ink-2:     oklch(43%   0.010 55);
-      --ink-3:     oklch(60%   0.009 58);
-      --line:      oklch(87%   0.012 62);
-      --accent:    oklch(50%   0.198 27);
-      --accent-hi: oklch(44%   0.180 27);
-      --accent-bg: oklch(95.5% 0.036 27);
+      --bg:        oklch(97.5% 0.013 222);
+      --bg-2:      oklch(94.8% 0.018 222);
+      --bg-3:      oklch(90.5% 0.024 222);
+      --ink:       oklch(18%   0.024 235);
+      --ink-2:     oklch(42%   0.027 235);
+      --ink-3:     oklch(59%   0.026 230);
+      --line:      oklch(84%   0.031 222);
+      --accent:    oklch(50%   0.145 238);
+      --accent-hi: oklch(43%   0.150 238);
+      --accent-bg: oklch(92.5% 0.045 238);
+      --mint:      oklch(62%   0.140 168);
+      --mint-bg:   oklch(93.5% 0.043 168);
+      --signal:    oklch(68%   0.120 195);
+      --signal-bg: oklch(93.5% 0.040 205);
+      --paper:     oklch(99%   0.006 222);
 
-      --serif: "Songti SC","STSong","SimSun","AR PL UMing CN",Georgia,"Times New Roman",serif;
-      --sans:  -apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+      --sans:  -apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans CJK SC",sans-serif;
       --mono:  ui-monospace,"SF Mono",Menlo,"Cascadia Code",Consolas,monospace;
 
-      --max: 1100px;
-      --r:   5px;
-    }
-
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --bg:        oklch(12%   0.012 52);
-        --bg-2:      oklch(17.5% 0.015 52);
-        --bg-3:      oklch(22%   0.016 52);
-        --ink:       oklch(94%   0.008 62);
-        --ink-2:     oklch(68%   0.010 60);
-        --ink-3:     oklch(48%   0.010 58);
-        --line:      oklch(27%   0.015 52);
-        --accent:    oklch(63%   0.198 27);
-        --accent-hi: oklch(70%   0.180 27);
-        --accent-bg: oklch(20%   0.038 27);
-      }
+      --max: 1180px;
+      --r:   6px;
+      --shadow: 0 18px 50px oklch(40% 0.04 235 / 0.12);
     }
 
     /* ── Reset ── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; overflow-x: hidden; }
     body {
-      background: var(--bg);
+      background:
+        linear-gradient(90deg, oklch(88% 0.025 222 / 0.38) 1px, transparent 1px),
+        linear-gradient(0deg, oklch(88% 0.025 222 / 0.34) 1px, transparent 1px),
+        var(--bg);
+      background-size: 44px 44px;
       color: var(--ink);
       font-family: var(--sans);
       font-size: 16px;
@@ -55,7 +49,6 @@
       text-rendering: optimizeLegibility;
       overflow-x: hidden;
     }
-    body.modal-open { overflow: hidden; }
     a { color: inherit; text-decoration: none; }
     img { display: block; max-width: 100%; }
 
@@ -74,18 +67,22 @@
     /* ── Shared type ── */
     .kicker {
       display: inline-block;
-      margin-bottom: 16px;
+      margin-bottom: 18px;
+      padding: 4px 8px;
+      border: 1px solid var(--line);
+      background: var(--paper);
       color: var(--accent);
       font-size: 11.5px;
-      font-weight: 700;
-      letter-spacing: 0.14em;
+      font-weight: 800;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
     }
     .section-title {
-      font-family: var(--serif);
-      font-size: clamp(30px, 4vw, 52px);
-      line-height: 1.16;
-      font-weight: 700;
+      max-width: 760px;
+      font-size: clamp(32px, 4.7vw, 58px);
+      line-height: 1.08;
+      font-weight: 850;
+      letter-spacing: 0;
     }
     .section-body {
       margin-top: 18px;
@@ -102,23 +99,20 @@
       justify-content: center;
       min-height: 44px;
       padding: 0 20px;
-      border: 1.5px solid transparent;
+      border: 1px solid transparent;
       border-radius: var(--r);
       font-family: var(--sans);
       font-size: 14px;
       font-weight: 600;
       white-space: nowrap;
-      transition: transform 150ms ease, box-shadow 150ms ease, background 150ms ease, border-color 150ms ease;
+      transition: transform 180ms cubic-bezier(.16, 1, .3, 1), box-shadow 180ms cubic-bezier(.16, 1, .3, 1), background 180ms ease, border-color 180ms ease;
       cursor: pointer;
       background: none;
     }
-    .btn-primary  { background: var(--ink);  color: var(--bg);   border-color: var(--ink); }
-    .btn-outline  { border-color: var(--line); color: var(--ink); }
-    .btn-tinted   { background: var(--accent-bg); color: var(--accent); }
-    .btn:hover    { transform: translateY(-1px); box-shadow: 0 6px 18px oklch(0% 0 0 / 0.10); }
-    @media (prefers-color-scheme: dark) {
-      .btn:hover  { box-shadow: 0 6px 18px oklch(0% 0 0 / 0.28); }
-    }
+    .btn-primary  { background: var(--accent);  color: oklch(98% 0.008 222); border-color: var(--accent); }
+    .btn-outline  { border-color: var(--line); color: var(--ink); background: var(--paper); }
+    .btn-tinted   { background: var(--mint-bg); color: oklch(38% 0.115 168); }
+    .btn:hover    { transform: translateY(-2px); box-shadow: 0 10px 24px oklch(38% 0.08 235 / 0.16); }
     .btn-row {
       display: flex;
       flex-wrap: wrap;
@@ -145,13 +139,16 @@
       min-height: 100svh;
       display: flex;
       align-items: center;
-      padding-block: 80px 96px;
+      padding-block: 72px 92px;
       border-bottom: 1px solid var(--line);
+      background:
+        radial-gradient(circle at 74% 18%, oklch(86% 0.070 168 / 0.75), transparent 24%),
+        linear-gradient(135deg, oklch(98.5% 0.006 222 / 0.90), oklch(93% 0.030 238 / 0.72));
     }
     .hero-inner {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 64px;
+      grid-template-columns: minmax(0, 0.92fr) minmax(360px, 1.08fr);
+      gap: clamp(42px, 7vw, 96px);
       align-items: center;
     }
 
@@ -178,24 +175,24 @@
       display: inline-flex;
       align-items: center;
       gap: 7px;
-      margin-bottom: 18px;
-      padding: 4px 10px;
+      margin-bottom: 20px;
+      padding: 5px 9px;
       background: var(--accent-bg);
-      border-radius: 4px;
+      border: 1px solid oklch(82% 0.055 238);
+      border-radius: 3px;
       color: var(--accent);
       font-size: 12px;
-      font-weight: 700;
-      letter-spacing: 0.09em;
+      font-weight: 850;
+      letter-spacing: 0.07em;
       text-transform: uppercase;
     }
 
     .hero-h1 {
-      font-family: var(--serif);
-      font-size: clamp(54px, 7.8vw, 96px);
-      line-height: 1.02;
-      font-weight: 700;
-      letter-spacing: 0.02em;
-      margin-bottom: 22px;
+      font-size: clamp(56px, 8.2vw, 104px);
+      line-height: 0.98;
+      font-weight: 900;
+      letter-spacing: 0;
+      margin-bottom: 24px;
     }
 
     .hero-copy {
@@ -214,23 +211,22 @@
       margin-bottom: 0;
     }
     .hero-tags li {
-      padding: 4px 11px;
+      padding: 5px 12px;
       border: 1px solid var(--line);
-      border-radius: 999px;
+      border-radius: 4px;
+      background: var(--paper);
       color: var(--ink-2);
-      font-size: 13px;
+      font-size: 12.5px;
+      font-weight: 650;
     }
 
     /* Code card */
     .code-card {
       border: 1px solid var(--line);
-      border-radius: 9px;
+      border-radius: var(--r);
       overflow: hidden;
-      background: var(--bg-2);
-      box-shadow: 0 16px 56px oklch(0% 0 0 / 0.07);
-    }
-    @media (prefers-color-scheme: dark) {
-      .code-card { box-shadow: 0 16px 56px oklch(0% 0 0 / 0.30); }
+      background: var(--paper);
+      box-shadow: var(--shadow);
     }
     .code-card-bar {
       display: flex;
@@ -238,7 +234,7 @@
       gap: 10px;
       padding: 12px 16px;
       border-bottom: 1px solid var(--line);
-      background: var(--bg);
+      background: var(--bg-2);
     }
     .win-dots {
       display: flex;
@@ -248,15 +244,17 @@
       width: 9px;
       height: 9px;
       border-radius: 50%;
-      background: var(--line);
+      background: var(--accent);
     }
+    .win-dots span:nth-child(2) { background: var(--signal); }
+    .win-dots span:nth-child(3) { background: var(--mint); }
     .code-filename {
       font-family: var(--mono);
       font-size: 11.5px;
       color: var(--ink-3);
     }
     .code-body {
-      padding: 20px 20px 18px;
+      padding: 24px 22px 20px;
       font-family: var(--mono);
       font-size: 13px;
       line-height: 1.95;
@@ -282,8 +280,8 @@
       width: 7px;
       height: 7px;
       border-radius: 50%;
-      background: oklch(62% 0.18 145);
-      box-shadow: 0 0 0 3px oklch(62% 0.18 145 / 0.18);
+      background: var(--mint);
+      box-shadow: 0 0 0 3px oklch(62% 0.14 168 / 0.20);
       flex-shrink: 0;
     }
 
@@ -296,8 +294,8 @@
     .meta-pill {
       padding: 12px 14px;
       border: 1px solid var(--line);
-      border-radius: 7px;
-      background: var(--bg);
+      border-radius: var(--r);
+      background: var(--paper);
     }
     .meta-pill strong {
       display: block;
@@ -316,7 +314,7 @@
     ══════════════════════════════ */
     .routing {
       padding-block: 96px;
-      background: var(--bg-2);
+      background: var(--paper);
       border-bottom: 1px solid var(--line);
     }
     .routing-inner {
@@ -327,12 +325,12 @@
     }
 
     /* SVG diagram colours via CSS (inline SVG inherits) */
-    .hub-node    { fill: var(--bg); stroke: var(--line); stroke-width: 1; }
+    .hub-node    { fill: var(--paper); stroke: var(--line); stroke-width: 1; }
     .hub-line    { stroke: var(--line); stroke-width: 1.5; fill: none; }
     .hub-text    { fill: var(--ink); font-family: -apple-system, "PingFang SC", sans-serif; }
     .hub-sub     { fill: var(--ink-3); }
     .hub-center  { fill: var(--accent); }
-    .hub-ctxt    { fill: oklch(100% 0 0); }
+    .hub-ctxt    { fill: oklch(98% 0.008 222); }
 
     /* ══════════════════════════════
        PROCESS
@@ -354,19 +352,18 @@
       align-items: baseline;
       padding-block: 32px;
       border-top: 1px solid var(--line);
+      background: linear-gradient(90deg, var(--paper), transparent 70%);
     }
     .step:last-child { border-bottom: 1px solid var(--line); }
     .step-num {
-      font-family: var(--serif);
       font-size: 34px;
-      font-weight: 700;
+      font-weight: 900;
       color: var(--accent);
       line-height: 1;
     }
     .step-title {
-      font-family: var(--serif);
       font-size: 19px;
-      font-weight: 700;
+      font-weight: 850;
       line-height: 1.35;
     }
     .step-body {
@@ -380,11 +377,9 @@
     ══════════════════════════════ */
     .trust {
       padding-block: 96px;
-      background: oklch(13.5% 0.016 52);
-      border-bottom: 1px solid oklch(22% 0.016 52);
-    }
-    @media (prefers-color-scheme: dark) {
-      .trust { background: oklch(8.5% 0.013 52); border-bottom-color: oklch(16% 0.014 52); }
+      background:
+        linear-gradient(90deg, oklch(48% 0.140 238), oklch(52% 0.115 210));
+      border-bottom: 1px solid oklch(42% 0.130 238);
     }
     .trust-inner {
       display: grid;
@@ -392,33 +387,29 @@
       gap: 80px;
       align-items: start;
     }
-    .trust .kicker     { color: var(--accent); }
-    .trust .section-title { color: oklch(94% 0.008 62); }
+    .trust .kicker { color: oklch(96% 0.030 205); background: oklch(38% 0.110 238 / 0.45); border-color: oklch(72% 0.060 230 / 0.45); }
+    .trust .section-title { color: oklch(97% 0.008 222); }
 
     .trust-panel { padding-top: 4px; }
     .trust-quote {
-      color: oklch(78% 0.011 62);
+      color: oklch(90% 0.022 222);
       font-size: clamp(15px, 1.7vw, 18px);
       line-height: 1.9;
       padding-bottom: 36px;
       margin-bottom: 36px;
-      border-bottom: 1px solid oklch(24% 0.016 52);
+      border-bottom: 1px solid oklch(72% 0.060 230 / 0.45);
     }
     .trust-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
-    .metric { padding-top: 18px; border-top: 1.5px solid oklch(30% 0.018 27); }
+    .metric { padding-top: 18px; border-top: 1px solid oklch(82% 0.055 230 / 0.52); }
     .metric-val {
       display: block;
-      font-family: var(--serif);
       font-size: 28px;
-      font-weight: 700;
-      color: var(--accent);
+      font-weight: 900;
+      color: oklch(94% 0.040 205);
       line-height: 1;
       margin-bottom: 7px;
     }
-    @media (prefers-color-scheme: dark) {
-      .metric-val { color: oklch(65% 0.18 27); }
-    }
-    .metric-lbl { display: block; font-size: 12.5px; color: oklch(58% 0.010 60); line-height: 1.6; }
+    .metric-lbl { display: block; font-size: 12.5px; color: oklch(88% 0.021 222); line-height: 1.6; }
 
     /* ══════════════════════════════
        PRICING
@@ -436,8 +427,9 @@
 
     .price-list {
       border: 1px solid var(--line);
-      border-radius: 9px;
+      border-radius: var(--r);
       overflow: hidden;
+      background: var(--paper);
     }
     .price-tier {
       display: grid;
@@ -449,9 +441,8 @@
     }
     .price-tier:last-child { border-bottom: 0; }
     .price-name {
-      font-family: var(--serif);
       font-size: 17px;
-      font-weight: 700;
+      font-weight: 850;
       margin-bottom: 4px;
     }
     .price-desc { color: var(--ink-2); font-size: 13.5px; line-height: 1.6; }
@@ -467,19 +458,18 @@
       gap: 1px;
       background: var(--line);
       border: 1px solid var(--line);
-      border-radius: 9px;
+      border-radius: var(--r);
       overflow: hidden;
       margin-bottom: 14px;
     }
     .price-fact {
-      background: var(--bg);
+      background: var(--paper);
       padding: 18px;
     }
     .price-fact strong {
       display: block;
-      font-family: var(--serif);
       font-size: clamp(22px, 3vw, 30px);
-      font-weight: 700;
+      font-weight: 900;
       color: var(--accent);
       line-height: 1;
       margin-bottom: 8px;
@@ -492,12 +482,12 @@
     }
     .price-badge {
       padding: 7px 13px;
-      border-radius: var(--r);
+      border-radius: 4px;
       font-size: 12.5px;
       font-weight: 700;
       white-space: nowrap;
       text-align: center;
-      border: 1.5px solid transparent;
+      border: 1px solid transparent;
     }
     button.price-badge {
       font-family: var(--sans);
@@ -514,7 +504,7 @@
     .final-cta {
       padding-block: 112px;
       text-align: center;
-      background: var(--bg-2);
+      background: var(--signal-bg);
     }
     .final-cta .section-title,
     .final-cta .section-body { margin-inline: auto; }
@@ -541,112 +531,6 @@
     .footer-brand img { width: 20px; height: 20px; border-radius: 5px; object-fit: cover; }
     .footer-brand span { font-size: 13px; font-weight: 600; color: var(--ink-2); }
     .footer-copy { font-size: 12px; color: var(--ink-3); }
-
-    /* ══════════════════════════════
-       MODAL
-    ══════════════════════════════ */
-    .modal {
-      position: fixed;
-      inset: 0;
-      z-index: 100;
-      display: grid;
-      place-items: center;
-      padding: 24px;
-      opacity: 0;
-      visibility: hidden;
-      pointer-events: none;
-      transition: opacity 220ms ease, visibility 220ms ease;
-    }
-    .modal.open {
-      opacity: 1;
-      visibility: visible;
-      pointer-events: auto;
-    }
-    .modal-backdrop {
-      position: absolute;
-      inset: 0;
-      background: oklch(0% 0 0 / 0.52);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      border: none;
-      cursor: pointer;
-      width: 100%;
-      height: 100%;
-    }
-    .modal-panel {
-      position: relative;
-      width: min(500px, 100% - 32px);
-      background: var(--bg);
-      border: 1px solid var(--line);
-      border-radius: 11px;
-      overflow: hidden;
-      box-shadow: 0 28px 90px oklch(0% 0 0 / 0.22);
-      transform: translateY(14px) scale(0.97);
-      transition: transform 280ms cubic-bezier(0.16, 1, 0.3, 1), opacity 220ms ease;
-      opacity: 0;
-    }
-    @media (prefers-color-scheme: dark) {
-      .modal-panel { box-shadow: 0 28px 90px oklch(0% 0 0 / 0.45); }
-    }
-    .modal.open .modal-panel { transform: none; opacity: 1; }
-
-    .modal-header {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 16px;
-      padding: 20px 22px 15px;
-      border-bottom: 1px solid var(--line);
-    }
-    .modal-title {
-      font-family: var(--serif);
-      font-size: 19px;
-      font-weight: 700;
-      margin-top: 4px;
-    }
-    .modal-subtitle {
-      margin-top: 5px;
-      font-size: 13px;
-      color: var(--ink-2);
-      line-height: 1.65;
-    }
-    .modal-close {
-      width: 32px;
-      height: 32px;
-      flex-shrink: 0;
-      display: grid;
-      place-items: center;
-      border: 1px solid var(--line);
-      border-radius: 50%;
-      background: var(--bg);
-      color: var(--ink);
-      font-size: 17px;
-      line-height: 1;
-      transition: background 140ms ease;
-    }
-    .modal-close:hover { background: var(--bg-2); }
-
-    .modal-body { padding: 16px; }
-    .modal-img-frame {
-      border: 1px solid var(--line);
-      border-radius: 7px;
-      overflow: hidden;
-      background: var(--bg-2);
-      min-height: 240px;
-      display: grid;
-      place-items: center;
-    }
-    .modal-img { width: 100%; max-height: 440px; object-fit: contain; }
-    .modal-fallback {
-      display: none;
-      padding: 28px 20px;
-      text-align: center;
-      color: var(--ink-2);
-      font-size: 14px;
-      line-height: 1.75;
-    }
-    .modal-img-frame.err .modal-img     { display: none; }
-    .modal-img-frame.err .modal-fallback { display: block; }
 
     /* ══════════════════════════════
        RESPONSIVE
@@ -695,8 +579,6 @@
       </ul>
       <div class="btn-row">
         <a class="btn btn-primary" href="https://novapi.cn/sign-in">立即接入</a>
-        <a class="btn btn-outline" href="https://novapi.cn/pricing">查看套餐</a>
-        <button class="btn btn-tinted" data-open-modal aria-haspopup="dialog" aria-controls="community-modal">加入社群</button>
       </div>
     </div>
 
@@ -844,8 +726,6 @@
       <p class="section-body">我们的缓存命中率高达 90%，命中缓存的部分仅按原价 1 折收费。正常使用情况下，0.5 RMB = 1 美金 = 约 300 万 GPT-5.5 Token。</p>
       <div class="btn-row">
         <a class="btn btn-primary" href="https://novapi.cn/sign-in">立即接入</a>
-        <a class="btn btn-outline" href="https://novapi.cn/pricing">购买套餐</a>
-        <button class="btn btn-tinted" data-open-modal aria-haspopup="dialog" aria-controls="community-modal">加入社群</button>
       </div>
     </div>
     <div>
@@ -869,7 +749,7 @@
             <p class="price-name">入门体验</p>
             <p class="price-desc">适合先测试 Claude / ChatGPT API 接入、验证速度与稳定性。</p>
           </div>
-          <a class="price-badge pb-link" href="https://novapi.cn/pricing">查看套餐</a>
+          <span class="price-badge pb-rec">体验</span>
         </div>
         <div class="price-tier">
           <div>
@@ -883,7 +763,6 @@
             <p class="price-name">团队协作</p>
             <p class="price-desc">适合课题组、实验室或多项目并行的 API 使用需求。</p>
           </div>
-          <button class="price-badge pb-consult" data-open-modal aria-haspopup="dialog" aria-controls="community-modal">咨询</button>
         </div>
       </div>
       <p class="price-note">实际消耗会随模型、上下文长度、缓存命中情况和任务类型变化，充值前可先小额测试。</p>
@@ -899,8 +778,6 @@
     <p class="section-body">从一个稳定高速的 API 中转站开始，把写作、代码、数据分析和文献处理接到同一条工作流里。</p>
     <div class="btn-row">
       <a class="btn btn-primary" href="https://novapi.cn/sign-in">立即接入</a>
-      <a class="btn btn-outline" href="https://novapi.cn/pricing">查看套餐</a>
-      <button class="btn btn-tinted" data-open-modal aria-haspopup="dialog" aria-controls="community-modal">加入社群</button>
     </div>
   </div>
 </section>
@@ -916,31 +793,6 @@
   </div>
 </footer>
 
-<!-- ══ MODAL ══ -->
-<div id="community-modal" class="modal" role="dialog" aria-modal="true"
-     aria-labelledby="modal-title" hidden>
-  <button class="modal-backdrop" type="button" data-close-modal aria-label="关闭"></button>
-  <div class="modal-panel">
-    <div class="modal-header">
-      <div>
-        <p class="kicker" style="margin-bottom:6px">Community</p>
-        <h2 class="modal-title" id="modal-title">加入 NovAPI 社群</h2>
-        <p class="modal-subtitle">扫码添加微信，优先添加左侧二维码；如遇添加频繁，可使用右侧备用二维码。</p>
-      </div>
-      <button class="modal-close" type="button" data-close-modal aria-label="关闭">×</button>
-    </div>
-    <div class="modal-body">
-      <div class="modal-img-frame" id="modal-frame">
-        <img class="modal-img" src="assets/wechat-community.png"
-             alt="NovAPI 微信社群二维码" id="modal-img">
-        <p class="modal-fallback">
-          请将二维码图片命名为 <code>wechat-community.png</code> 并放入 <code>assets/</code> 文件夹。
-        </p>
-      </div>
-    </div>
-  </div>
-</div>
-
 <script>
   // Scroll reveal
   const obs = new IntersectionObserver(
@@ -950,37 +802,6 @@
     { threshold: 0.11 }
   );
   document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
-
-  // Modal
-  const modal  = document.getElementById('community-modal');
-  const mImg   = document.getElementById('modal-img');
-  const mFrame = document.getElementById('modal-frame');
-  let prev = null;
-
-  const openModal = e => {
-    e?.preventDefault();
-    prev = document.activeElement;
-    modal.hidden = false;
-    document.body.classList.add('modal-open');
-    requestAnimationFrame(() => {
-      modal.classList.add('open');
-      modal.querySelector('.modal-close')?.focus({ preventScroll: true });
-    });
-  };
-
-  const closeModal = () => {
-    modal.classList.remove('open');
-    document.body.classList.remove('modal-open');
-    setTimeout(() => { modal.hidden = true; }, 240);
-    prev?.focus({ preventScroll: true });
-  };
-
-  document.querySelectorAll('[data-open-modal]').forEach(el => el.addEventListener('click', openModal));
-  document.querySelectorAll('[data-close-modal]').forEach(el => el.addEventListener('click', closeModal));
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape' && modal.classList.contains('open')) closeModal();
-  });
-  mImg?.addEventListener('error', () => mFrame?.classList.add('err'));
 </script>
 </body>
 </html>
