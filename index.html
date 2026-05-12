@@ -8,6 +8,7 @@
   <style>
     /* ── Tokens ── */
     :root {
+      color-scheme: light;
       --bg:        oklch(97.5% 0.013 222);
       --bg-2:      oklch(94.8% 0.018 222);
       --bg-3:      oklch(90.5% 0.024 222);
@@ -531,6 +532,78 @@
     .footer-brand img { width: 20px; height: 20px; border-radius: 5px; object-fit: cover; }
     .footer-brand span { font-size: 13px; font-weight: 600; color: var(--ink-2); }
     .footer-copy { font-size: 12px; color: var(--ink-3); }
+
+    /* ── Automatic dark mode ── */
+    @media (prefers-color-scheme: dark) {
+      :root {
+        color-scheme: dark;
+        --bg:        oklch(17%   0.018 232);
+        --bg-2:      oklch(22%   0.021 232);
+        --bg-3:      oklch(29%   0.025 232);
+        --ink:       oklch(94%   0.010 222);
+        --ink-2:     oklch(76%   0.020 225);
+        --ink-3:     oklch(61%   0.025 225);
+        --line:      oklch(34%   0.030 228);
+        --accent:    oklch(67%   0.130 226);
+        --accent-hi: oklch(74%   0.120 226);
+        --accent-bg: oklch(29%   0.055 226);
+        --mint:      oklch(73%   0.125 168);
+        --mint-bg:   oklch(28%   0.050 168);
+        --signal:    oklch(76%   0.095 195);
+        --signal-bg: oklch(24%   0.035 205);
+        --paper:     oklch(20%   0.018 232);
+        --shadow: 0 22px 58px oklch(7% 0.025 235 / 0.48);
+      }
+
+      body {
+        background:
+          linear-gradient(90deg, oklch(42% 0.026 230 / 0.20) 1px, transparent 1px),
+          linear-gradient(0deg, oklch(42% 0.026 230 / 0.16) 1px, transparent 1px),
+          var(--bg);
+      }
+
+      .hero {
+        background:
+          radial-gradient(circle at 74% 18%, oklch(45% 0.075 168 / 0.30), transparent 25%),
+          linear-gradient(135deg, oklch(19% 0.020 232 / 0.96), oklch(25% 0.042 230 / 0.86));
+      }
+
+      .hero-eyebrow {
+        border-color: oklch(46% 0.055 226);
+      }
+
+      .btn-primary {
+        color: oklch(15% 0.015 232);
+      }
+
+      .btn-outline {
+        background: var(--bg-2);
+      }
+
+      .btn-tinted {
+        color: oklch(84% 0.120 168);
+      }
+
+      .dot-green {
+        box-shadow: 0 0 0 3px oklch(73% 0.125 168 / 0.18);
+      }
+
+      .trust {
+        background:
+          linear-gradient(90deg, oklch(28% 0.085 235), oklch(31% 0.070 205));
+        border-bottom-color: oklch(36% 0.070 225);
+      }
+
+      .trust .kicker {
+        color: oklch(90% 0.035 205);
+        background: oklch(22% 0.055 235 / 0.68);
+      }
+
+      .pb-link {
+        background: var(--ink);
+        color: var(--bg);
+      }
+    }
 
     /* ══════════════════════════════
        RESPONSIVE
