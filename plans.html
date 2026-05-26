@@ -87,11 +87,15 @@
       }
 
       .brand-mark {
-        display: block;
+        display: grid;
         width: 30px;
         height: 30px;
-        border-radius: 7px;
-        object-fit: cover;
+        place-items: center;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: var(--panel);
+        color: var(--accent);
+        font-weight: 700;
       }
 
       .nav {
@@ -186,12 +190,12 @@
       .plan {
         position: relative;
         display: flex;
-        min-height: 280px;
+        min-height: 260px;
         flex-direction: column;
         border: 2px solid transparent;
         border-radius: 16px;
         background: var(--panel);
-        padding: 24px;
+        padding: 24px 24px 18px;
         box-shadow: 0 8px 22px rgba(15, 23, 42, 0.07);
         transition: border-color 180ms ease;
       }
@@ -320,7 +324,7 @@
     <header class="topbar">
       <div class="wrap topbar-inner">
         <a class="brand" href="/">
-          <img class="brand-mark" src="/logo.png" alt="小北科研API" />
+          <span class="brand-mark">北</span>
           <span>小北科研API</span>
         </a>
         <nav class="nav" aria-label="主导航">
