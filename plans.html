@@ -277,10 +277,22 @@
       }
 
       .status {
-        min-height: 24px;
-        margin: 20px 0 0;
+        display: none;
+        width: fit-content;
+        max-width: 100%;
+        min-height: 0;
+        margin: -10px auto 18px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: var(--panel);
+        padding: 6px 14px;
         color: var(--ink-3);
-        font-size: 14px;
+        font-size: 13px;
+        line-height: 1.5;
+      }
+
+      .status:not(:empty) {
+        display: block;
       }
 
       .status.ok {
@@ -341,9 +353,9 @@
         <h1 class="section-title">选择充值额度</h1>
       </div>
 
-      <section id="plans" class="plans" aria-label="充值套餐"></section>
-
       <div id="status" class="status" role="status"></div>
+
+      <section id="plans" class="plans" aria-label="充值套餐"></section>
     </main>
 
     <script>
