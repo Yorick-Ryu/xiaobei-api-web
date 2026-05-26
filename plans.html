@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>套餐充值 - 小北科研API</title>
+    <link rel="icon" href="assets/icon.png" />
     <style>
       :root {
         --bg: #f8fafc;
@@ -86,15 +87,11 @@
       }
 
       .brand-mark {
-        display: grid;
+        display: block;
         width: 30px;
         height: 30px;
-        place-items: center;
-        border: 1px solid var(--line);
-        border-radius: 10px;
-        background: var(--panel);
-        color: var(--accent);
-        font-weight: 700;
+        border-radius: 7px;
+        object-fit: cover;
       }
 
       .nav {
@@ -321,7 +318,7 @@
     <header class="topbar">
       <div class="wrap topbar-inner">
         <a class="brand" href="/">
-          <span class="brand-mark">北</span>
+          <img class="brand-mark" src="assets/icon.png" alt="小北科研API" />
           <span>小北科研API</span>
         </a>
         <nav class="nav" aria-label="主导航">
@@ -521,6 +518,14 @@
         if (button) button.textContent = paying ? "正在跳转" : "立即购买";
       }
 
+      function resetPaying() {
+        state.paying = false;
+        document.querySelectorAll("[data-pay]").forEach((item) => {
+          item.disabled = false;
+          item.textContent = "立即购买";
+        });
+      }
+
       async function pay(pay, amount, button) {
         if (state.paying) return;
         const payMoney = Number(pay || 0);
@@ -557,6 +562,8 @@
         const button = event.target.closest("[data-pay]");
         if (button) pay(button.dataset.pay, button.dataset.amount, button);
       });
+
+      window.addEventListener("pageshow", resetPaying);
 
       loadStatus()
         .then(loadUser)
