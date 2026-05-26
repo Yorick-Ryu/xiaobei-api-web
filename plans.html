@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>套餐充值 - 小北科研API</title>
-    <link rel="icon" href="assets/icon.png" />
+    <link rel="icon" type="image/png" href="/logo.png" />
     <style>
       :root {
         --bg: #f8fafc;
@@ -178,19 +178,21 @@
       .plans {
         display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 24px;
+        max-width: 1040px;
+        margin-inline: auto;
+        gap: 18px;
       }
 
       .plan {
         position: relative;
         display: flex;
-        min-height: 330px;
+        min-height: 280px;
         flex-direction: column;
         border: 2px solid transparent;
-        border-radius: 20px;
+        border-radius: 16px;
         background: var(--panel);
-        padding: 32px;
-        box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+        padding: 24px;
+        box-shadow: 0 8px 22px rgba(15, 23, 42, 0.07);
         transition: border-color 180ms ease;
       }
 
@@ -207,15 +209,15 @@
         border-radius: 999px;
         background: var(--accent);
         color: #fff;
-        padding: 6px 14px;
-        font-size: 12px;
+        padding: 5px 12px;
+        font-size: 11px;
         font-weight: 700;
         white-space: nowrap;
       }
 
       .plan h3 {
         margin: 0;
-        font-size: 24px;
+        font-size: 21px;
         line-height: 1.2;
       }
 
@@ -223,8 +225,8 @@
         display: flex;
         align-items: flex-end;
         gap: 4px;
-        margin-top: 18px;
-        font-size: 48px;
+        margin-top: 14px;
+        font-size: 40px;
         font-weight: 800;
         line-height: 1;
       }
@@ -232,21 +234,21 @@
       .pay-price span {
         margin-bottom: 5px;
         color: var(--ink-3);
-        font-size: 14px;
+        font-size: 13px;
         font-weight: 600;
       }
 
       .metrics {
         display: grid;
-        gap: 10px;
-        margin: 28px 0 28px;
+        gap: 8px;
+        margin: 20px 0 18px;
       }
 
       .metric {
         display: flex;
         align-items: flex-start;
         color: var(--ink-2);
-        font-size: 15px;
+        font-size: 14px;
       }
 
       .metric.disabled {
@@ -259,15 +261,15 @@
       }
 
       .amount-strong {
-        font-size: 22px;
+        font-size: 20px;
         line-height: 1;
       }
 
       .plan .btn {
         width: 100%;
-        margin-top: 6px;
-        min-height: 48px;
-        border-radius: 12px;
+        margin-top: 4px;
+        min-height: 44px;
+        border-radius: 10px;
       }
 
       .status {
@@ -318,7 +320,7 @@
     <header class="topbar">
       <div class="wrap topbar-inner">
         <a class="brand" href="/">
-          <img class="brand-mark" src="assets/icon.png" alt="小北科研API" />
+          <img class="brand-mark" src="/logo.png" alt="小北科研API" />
           <span>小北科研API</span>
         </a>
         <nav class="nav" aria-label="主导航">
