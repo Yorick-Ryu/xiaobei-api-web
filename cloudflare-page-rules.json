@@ -1,0 +1,42 @@
+[
+  {
+    "description": "Cache BeiAPI public homepage document and assets",
+    "targets": [
+      {
+        "target": "url",
+        "constraint": {
+          "operator": "matches",
+          "value": "https://www.beiapi.cn/beiapi-home/*"
+        }
+      }
+    ],
+    "actions": [
+      {
+        "id": "cache_level",
+        "value": "cache_everything"
+      }
+    ],
+    "priority": 1,
+    "status": "active"
+  },
+  {
+    "description": "Cache BeiAPI public application entry HTML",
+    "targets": [
+      {
+        "target": "url",
+        "constraint": {
+          "operator": "matches",
+          "value": "https://www.beiapi.cn/"
+        }
+      }
+    ],
+    "actions": [
+      {
+        "id": "cache_level",
+        "value": "cache_everything"
+      }
+    ],
+    "priority": 2,
+    "status": "active"
+  }
+]

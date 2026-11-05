@@ -1,0 +1,11 @@
+{
+  "source_url": "https://beiapi.top/",
+  "source_sha256": "45b977d6c1ad82a638cc58d3cceb0b310b1928808c2e721a16e579ba3e4199da",
+  "nginx_base_sha256": "0663e48717d907755d20cf40fcc4d426a4dcfba01da96067dd07a8116abf0a04",
+  "newapi_revision": "0937b154e4ab09227483f371ff5d0a743926e882",
+  "asset_sizes": {
+    "6b1764405e4fecf6.png": 52424,
+    "3af3c5d013189f31.jpg": 75312,
+    "3a3296fc7db30a31.png": 163317
+  }
+}
