@@ -1,0 +1,24 @@
+{
+  "nginx_files": [
+    {
+      "source": "nginx/novapi.cn.conf",
+      "target": "/etc/nginx/sites-available/novapi.cn",
+      "baseline_sha256": "7a8e4be90c45a065d34ea7e32b14b6b9c1eddbfc10067f57325b005f878b7f49"
+    },
+    {
+      "source": "nginx/dianapi.cn.conf",
+      "target": "/etc/nginx/sites-available/dianapi.cn",
+      "baseline_sha256": "8edba030bcdf13705e05b6dd3a0a8a5a6bd882067035f84cd1ed49c7212208fe"
+    },
+    {
+      "source": "nginx/dianapi-locations.conf",
+      "target": "/opt/stacks/bingdian-brand-proxy-live/nginx-locations.conf",
+      "baseline_sha256": "01f48ca3cc45afba015aa2bee9576f6a79bc73e6167116aa98ca96d6fc7aefbe"
+    }
+  ],
+  "dianapi_home_sha256": "663904b5ad7691605425c645fe3a95bd4e4aa3d02803d52b4a00ab609837231b",
+  "source_urls": {
+    "novapi": "https://home.novapi.cn/",
+    "dianapi": "https://www.dianapi.cn/bingdian/home.html"
+  }
+}

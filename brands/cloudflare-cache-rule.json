@@ -1,0 +1,15 @@
+{
+  "description": "Cache Novapi and Dianapi public homepage HTML",
+  "expression": "(http.host eq \"www.novapi.cn\" and (http.request.uri.path eq \"/\" or starts_with(http.request.uri.path, \"/novapi-home/\"))) or (http.host eq \"www.dianapi.cn\" and http.request.uri.path in {\"/\" \"/bingdian/home.html\"})",
+  "action": "set_cache_settings",
+  "action_parameters": {
+    "cache": true,
+    "edge_ttl": {
+      "mode": "bypass_by_default"
+    },
+    "browser_ttl": {
+      "mode": "respect_origin"
+    }
+  },
+  "enabled": true
+}
