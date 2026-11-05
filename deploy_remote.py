@@ -18,7 +18,10 @@ def run(*args):
 
 assert run('hostname').strip() == 'beiapi'
 assert hashlib.sha256(site.read_bytes()).hexdigest() == metadata['nginx_base_sha256'], 'Live site changed; review before deploying'
-assert not public.exists(), 'Homepage target already exists; review before replacing'
+if public.exists():
+    expected = {str(p.relative_to(source / 'public')): hashlib.sha256(p.read_bytes()).hexdigest() for p in (source / 'public').rglob('*') if p.is_file()}
+    actual = {str(p.relative_to(public)): hashlib.sha256(p.read_bytes()).hexdigest() for p in public.rglob('*') if p.is_file()}
+    assert actual == expected, 'Live homepage files differ; review before replacing'
 assert not (release / 'nginx-before.conf').exists(), 'Release already applied'
 shutil.copy2(site, release / 'nginx-before.conf')
 state = {
@@ -38,7 +41,8 @@ test_config = release / 'nginx-test.conf'
 test_config.write_text(main.replace(needle, '\n'.join(includes)))
 run('nginx', '-t', '-c', str(test_config))
 
-shutil.copytree(source / 'public', public)
+if not public.exists():
+    shutil.copytree(source / 'public', public)
 for directory, dirs, files in os.walk(public):
     os.chmod(directory, 0o755)
     for name in files:
