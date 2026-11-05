@@ -14,6 +14,10 @@
       {
         "id": "cache_level",
         "value": "cache_everything"
+      },
+      {
+        "id": "browser_cache_ttl",
+        "value": 300
       }
     ],
     "priority": 1,
@@ -34,6 +38,10 @@
       {
         "id": "cache_level",
         "value": "cache_everything"
+      },
+      {
+        "id": "browser_cache_ttl",
+        "value": 300
       }
     ],
     "priority": 2,

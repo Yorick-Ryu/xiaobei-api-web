@@ -30,12 +30,22 @@ hosts = request('GET', '/zones/' + zone_id + '/custom_hostnames?hostname=www.bei
 assert any(h['hostname'] == 'www.beiapi.cn' and h['status'] == 'active' for h in hosts)
 endpoint = '/zones/' + zone_id + '/pagerules'
 before = request('GET', endpoint)
-(args.evidence / 'cloudflare-page-rules-before.json').write_text(json.dumps(before, indent=2) + '\n')
+snapshot = args.evidence / 'cloudflare-page-rules-before.json'
+if not snapshot.exists():
+    snapshot.write_text(json.dumps(before, indent=2) + '\n')
+owned_path = args.evidence / 'cloudflare-page-rules-created.json'
+owned = json.loads(owned_path.read_text()) if owned_path.exists() else []
 created = []
 for rule in json.loads(Path(__file__).with_name('cloudflare-page-rules.json').read_text()):
     body = {k: v for k, v in rule.items() if k != 'description'}
-    assert not any(x['targets'] == body['targets'] for x in before), 'Matching rule exists; review instead of replacing'
-    result = request('POST', endpoint, body)
+    matches = [x for x in before if x['targets'] == body['targets']]
+    if matches:
+        assert len(matches) == 1 and any(x['id'] == matches[0]['id'] for x in owned), 'Matching rule is not owned by this release'
+        previous = next(x for x in owned if x['id'] == matches[0]['id'])
+        assert previous['actions'] == matches[0]['actions'], 'Rule changed since this release; review first'
+        result = request('PATCH', endpoint + '/' + matches[0]['id'], body)
+    else:
+        result = request('POST', endpoint, body)
     created.append(result)
     (args.evidence / 'cloudflare-page-rules-created.json').write_text(json.dumps(created, indent=2) + '\n')
     print(json.dumps({'created': result['id'], 'targets': result['targets'], 'actions': result['actions']}), flush=True)

@@ -16,7 +16,10 @@ video remains on its existing dedicated assets host and loads only on demand.
 with `python3 cloudflare.py <evidence-directory>` using the existing provider-zone
 token; the script snapshots and preserves unrelated rules. Rules cover only
 `https://www.beiapi.cn/` and `https://www.beiapi.cn/beiapi-home/*`.
-The live provider zone and active SaaS hostname are checked before writes.
+The live provider zone and active SaaS hostname are checked before writes. Browser
+TTL is scoped to five minutes, overriding the provider zone's four-hour minimum;
+longer origin asset TTLs remain effective. Re-running with the same evidence
+directory may update only this release's recorded rules after a conflict check.
 
 Deploy only a committed `git archive` to a private release directory on `ssh beiapi`
 (address must be verified as `179.255.125.53`). Extract it as `source/` and run
