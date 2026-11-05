@@ -18,7 +18,13 @@ def request(method, path, body=None):
                '-H', 'Content-Type: application/json', 'https://api.cloudflare.com/client/v4' + path]
     if body is not None:
         command += ['--data-binary', json.dumps(body)]
-    response = subprocess.run(command, input=config, capture_output=True, text=True, check=True)
+    for attempt in range(4):
+        response = subprocess.run(command, input=config, capture_output=True, text=True)
+        # A TLS handshake failure occurs before an HTTP mutation can be sent.
+        if response.returncode != 35 or attempt == 3:
+            break
+    if response.returncode:
+        raise RuntimeError(f'Cloudflare transport failed before completion: curl exit {response.returncode}')
     data = json.loads(response.stdout)
     if not data.get('success'):
         raise RuntimeError(json.dumps({'path': path, 'errors': data.get('errors')}, ensure_ascii=False))
@@ -47,7 +53,8 @@ for rule in json.loads(Path(__file__).with_name('cloudflare-page-rules.json').re
     else:
         result = request('POST', endpoint, body)
     created.append(result)
-    (args.evidence / 'cloudflare-page-rules-created.json').write_text(json.dumps(created, indent=2) + '\n')
+    owned = [x for x in owned if x['id'] != result['id']] + [result]
+    owned_path.write_text(json.dumps(owned, indent=2) + '\n')
     print(json.dumps({'created': result['id'], 'targets': result['targets'], 'actions': result['actions']}), flush=True)
 after = request('GET', endpoint)
 (args.evidence / 'cloudflare-page-rules-after.json').write_text(json.dumps(after, indent=2) + '\n')
