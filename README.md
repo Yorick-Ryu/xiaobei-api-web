@@ -1,5 +1,11 @@
 # BeiAPI same-origin public homepage
 
+Local preview: run `python3 preview.py` and open
+`http://localhost:8787/beiapi-home/#campus-partner`. It serves the actual public
+files, resolves their same-origin assets, and opens console links in the existing
+local NewAPI at `http://localhost:3001`. It does not change production or database
+homepage settings.
+
 The public display page is served at `/beiapi-home/` on BeiAPI's existing website
 hosts. Nginx's domain-specific `/api/home_page_content` returns the current host's
 URL, leaving the shared NewAPI database option and other brands unchanged.
