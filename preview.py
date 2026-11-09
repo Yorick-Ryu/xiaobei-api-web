@@ -19,7 +19,7 @@ class PreviewHandler(SimpleHTTPRequestHandler):
             self.send_header('Location', '/beiapi-home/')
             self.end_headers()
             return
-        if path.rstrip('/') in ('/campus-partner', '/sign-in'):
+        if path.rstrip('/') in ('/campus-partner', '/sign-in', '/dashboard', '/pricing'):
             self.send_response(302)
             self.send_header('Location', 'http://localhost:3001' + self.path)
             self.end_headers()
@@ -38,7 +38,7 @@ if __name__ == '__main__':
     public = Path(__file__).resolve().parent / 'public'
     handler = partial(PreviewHandler, directory=str(public))
     server = ThreadingHTTPServer(('127.0.0.1', args.port), handler)
-    print(f'Local: http://localhost:{args.port}/beiapi-home/#campus-partner', flush=True)
+    print(f'Local: http://localhost:{args.port}/beiapi-home/', flush=True)
     try:
         server.serve_forever()
     except KeyboardInterrupt:
