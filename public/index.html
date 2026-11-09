@@ -1081,6 +1081,31 @@ html.modal-open, body.modal-open { overflow: hidden; }
 
 <script>
 (() => {
+  if (window.parent === window) return;
+  let lastScrolled = null;
+  let pending = false;
+  const report = force => {
+    pending = false;
+    const scrolled = window.scrollY > 20;
+    if (!force && scrolled === lastScrolled) return;
+    lastScrolled = scrolled;
+    window.parent.postMessage({ type: 'beiapi:home-scroll', scrolled }, '*');
+  };
+  window.addEventListener('scroll', () => {
+    if (pending) return;
+    pending = true;
+    requestAnimationFrame(() => report(false));
+  }, { passive: true });
+  window.addEventListener('pageshow', () => report(true));
+  window.addEventListener('message', event => {
+    if (event.source === window.parent && event.data?.type === 'beiapi:home-scroll-request') report(true);
+  });
+  report(true);
+})();
+</script>
+
+<script>
+(() => {
   const root = document.documentElement;
   const media = matchMedia('(prefers-color-scheme: dark)');
   const toggle = document.querySelector('.theme-toggle');

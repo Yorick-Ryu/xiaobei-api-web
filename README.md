@@ -39,6 +39,9 @@ new private release directory, save the archive's exact commit in
 --expected-before <live-html-sha256>`. It checks the host, baseline and unchanged
 assets, preserves rollback HTML, and atomically replaces only the homepage.
 It does not reload or restart services. Purge only the changed public HTML URLs.
+For a reviewed brand-script update, add
+`--expected-nav-before <live-nav-plans-sha256>`; this also checks and preserves
+the live script before replacing it. Both files roll back if installation fails.
 After checking for later edits, rollback restores the recorded `index-before.html`
 atomically and purges the same URLs. No application or database changes are needed.
 
