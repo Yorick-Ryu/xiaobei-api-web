@@ -1,5 +1,9 @@
 # BeiAPI same-origin public homepage
 
+Repository: <https://github.com/Yorick-Ryu/xiaobei-api-web>. The current
+BeiAPI-hosted homepage source is `public/index.html`; root `index.html`,
+`plans.html` and their assets retain the earlier standalone site.
+
 Local preview: run `python3 preview.py` and open
 `http://localhost:8787/beiapi-home/#campus-partner`. It serves the actual public
 files, resolves their same-origin assets, and opens console links in the existing
@@ -27,7 +31,17 @@ TTL is scoped to five minutes, overriding the provider zone's four-hour minimum;
 longer origin asset TTLs remain effective. Re-running with the same evidence
 directory may update only this release's recorded rules after a conflict check.
 
-Deploy only a committed `git archive` to a private release directory on `ssh beiapi`
+For an HTML-only update, extract a committed `git archive` as `source/` inside a
+new private release directory, save the archive's exact commit in
+`source-commit.txt`, and run `python3 source/deploy_content_remote.py
+--expected-before <live-html-sha256>`. It checks the host, baseline and unchanged
+assets, preserves rollback HTML, and atomically replaces only the homepage.
+It does not reload or restart services. Purge only the changed public HTML URLs.
+After checking for later edits, rollback restores the recorded `index-before.html`
+atomically and purges the same URLs. No application or database changes are needed.
+
+The original `deploy_remote.py` is for the initial Nginx installation:
+deploy only a committed `git archive` to a private release directory on `ssh beiapi`
 (address must be verified as `179.255.125.53`). Extract it as `source/` and run
 `python3 source/deploy_remote.py`. It conflict-checks the live config, preserves
 rollback data, validates the complete staged Nginx configuration, installs static

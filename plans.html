@@ -1,0 +1,669 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>套餐充值 - 小北科研API</title>
+    <link rel="icon" type="image/png" href="/logo.png" />
+    <style>
+      :root {
+        --bg: #f8fafc;
+        --panel: #ffffff;
+        --panel-soft: #f1f5f9;
+        --ink: #111827;
+        --ink-2: #4b5563;
+        --ink-3: #94a3b8;
+        --line: #e5e7eb;
+        --accent: #2563eb;
+        --accent-hi: #1d4ed8;
+        --accent-bg: #eff6ff;
+        --ok: #16a34a;
+        --danger: #dc2626;
+        --sans: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB",
+          "Microsoft YaHei", sans-serif;
+        --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+        --max: 1200px;
+        --r: 16px;
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+
+      html {
+        overflow-x: hidden;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        overflow-x: hidden;
+        background:
+          radial-gradient(circle at top, rgba(37, 99, 235, 0.08), transparent 360px),
+          var(--bg);
+        color: var(--ink);
+        font-family: var(--sans);
+        font-size: 16px;
+        line-height: 1.7;
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .wrap {
+        width: min(var(--max), 100% - 48px);
+        margin-inline: auto;
+      }
+
+      .topbar {
+        border-bottom: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.86);
+        backdrop-filter: blur(12px);
+      }
+
+      .topbar-inner {
+        display: flex;
+        min-height: 64px;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+      }
+
+      .brand {
+        display: inline-flex;
+        min-width: 0;
+        align-items: center;
+        gap: 10px;
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--ink-2);
+        letter-spacing: 0.03em;
+      }
+
+      .brand-mark {
+        display: grid;
+        width: 30px;
+        height: 30px;
+        place-items: center;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: var(--panel);
+        color: var(--accent);
+        font-weight: 700;
+      }
+
+      .nav {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .nav a,
+      .btn {
+        display: inline-flex;
+        min-height: 42px;
+        align-items: center;
+        justify-content: center;
+        border: 1.5px solid transparent;
+        border-radius: 10px;
+        padding: 0 18px;
+        background: none;
+        color: var(--ink);
+        font-family: var(--sans);
+        font-size: 14px;
+        font-weight: 600;
+        white-space: nowrap;
+        cursor: pointer;
+        transition:
+          background 150ms ease,
+          border-color 150ms ease;
+      }
+
+      .nav a:hover,
+      .btn:hover {
+        background: var(--panel-soft);
+      }
+
+      .btn-primary:hover {
+        background: var(--accent-hi);
+      }
+
+      .btn-primary {
+        border-color: var(--accent);
+        background: var(--accent);
+        color: #fff;
+      }
+
+      .btn-outline {
+        border-color: var(--line);
+      }
+
+      .btn-tinted {
+        background: var(--accent-bg);
+        color: var(--accent);
+      }
+
+      .btn:disabled {
+        cursor: not-allowed;
+        opacity: 0.58;
+      }
+
+      .main {
+        padding: 72px 0 72px;
+      }
+
+      .section-head {
+        margin: 0 auto 36px;
+        max-width: 780px;
+        text-align: center;
+      }
+
+      .section-title {
+        margin: 0;
+        font-size: clamp(34px, 5vw, 56px);
+        line-height: 1.12;
+        letter-spacing: 0;
+      }
+
+      .section-body {
+        max-width: 620px;
+        margin: 14px auto 0;
+        color: var(--ink-2);
+        font-size: 17px;
+        line-height: 1.8;
+      }
+
+      .plans {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        max-width: 1040px;
+        margin-inline: auto;
+        gap: 18px;
+      }
+
+      .plans-note {
+        max-width: 1040px;
+        margin: 10px auto 0;
+        padding: 4px 0 0;
+        color: var(--ink);
+        font-size: 15px;
+        font-weight: 700;
+        text-align: center;
+      }
+
+      .service-link {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        border: 0;
+        border-radius: 8px;
+        background: transparent;
+        color: var(--accent);
+        font: inherit;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .service-link:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 3px;
+      }
+
+      .service-link::after {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        height: 12px;
+        content: "";
+      }
+
+      .service-qr {
+        position: absolute;
+        top: calc(100% + 10px);
+        left: 50%;
+        z-index: 10;
+        width: min(360px, calc(100vw - 48px));
+        transform: translateX(-50%) translateY(-4px);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: var(--panel);
+        padding: 10px;
+        box-shadow: 0 18px 42px rgba(15, 23, 42, 0.18);
+        opacity: 0;
+        pointer-events: none;
+        transition:
+          opacity 150ms ease,
+          transform 150ms ease;
+      }
+
+      .service-qr img {
+        display: block;
+        width: 100%;
+        border-radius: 8px;
+      }
+
+      .service-link:hover .service-qr,
+      .service-link:focus-visible .service-qr {
+        transform: translateX(-50%);
+        opacity: 1;
+      }
+
+      .plan {
+        position: relative;
+        display: flex;
+        min-height: 260px;
+        flex-direction: column;
+        border: 2px solid transparent;
+        border-radius: 16px;
+        background: var(--panel);
+        padding: 24px 24px 18px;
+        box-shadow: 0 8px 22px rgba(15, 23, 42, 0.07);
+        transition: border-color 180ms ease;
+      }
+
+      .plan-featured {
+        border-color: var(--accent);
+      }
+
+      .tag {
+        position: absolute;
+        top: -14px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: fit-content;
+        border-radius: 999px;
+        background: var(--accent);
+        color: #fff;
+        padding: 5px 12px;
+        font-size: 11px;
+        font-weight: 700;
+        white-space: nowrap;
+      }
+
+      .plan h3 {
+        margin: 0;
+        font-size: 21px;
+        line-height: 1.2;
+      }
+
+      .pay-price {
+        display: flex;
+        align-items: flex-end;
+        gap: 4px;
+        margin-top: 14px;
+        font-size: 40px;
+        font-weight: 800;
+        line-height: 1;
+      }
+
+      .pay-price span {
+        margin-bottom: 5px;
+        color: var(--ink-3);
+        font-size: 13px;
+        font-weight: 600;
+      }
+
+      .metrics {
+        display: grid;
+        gap: 8px;
+        margin: 20px 0 18px;
+      }
+
+      .metric {
+        display: flex;
+        align-items: flex-start;
+        color: var(--ink-2);
+        font-size: 14px;
+      }
+
+      .metric.disabled {
+        color: var(--ink-2);
+      }
+
+      .metric strong {
+        color: var(--ink);
+        font-weight: 700;
+      }
+
+      .amount-strong {
+        font-size: 20px;
+        line-height: 1;
+      }
+
+      .plan .btn {
+        width: 100%;
+        margin-top: 4px;
+        min-height: 44px;
+        border-radius: 10px;
+      }
+
+      .status {
+        display: none;
+        width: fit-content;
+        max-width: 100%;
+        min-height: 0;
+        margin: -10px auto 18px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: var(--panel);
+        padding: 6px 14px;
+        color: var(--ink-3);
+        font-size: 13px;
+        line-height: 1.5;
+      }
+
+      .status:not(:empty) {
+        display: block;
+      }
+
+      .status.ok {
+        color: var(--ok);
+      }
+
+      .status.error {
+        color: var(--danger);
+      }
+
+      @media (max-width: 920px) {
+        .plans {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 560px) {
+        .wrap {
+          width: min(100% - 28px, var(--max));
+        }
+
+        .topbar-inner {
+          align-items: flex-start;
+          flex-direction: column;
+          padding: 14px 0;
+        }
+
+        .nav {
+          width: 100%;
+          overflow-x: auto;
+          padding-bottom: 2px;
+        }
+
+        .main {
+          padding: 48px 0 56px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="wrap topbar-inner">
+        <a class="brand" href="/">
+          <span class="brand-mark">北</span>
+          <span>小北科研API</span>
+        </a>
+        <nav class="nav" aria-label="主导航">
+          <a href="/pricing">模型定价</a>
+          <a href="/plans">套餐充值</a>
+          <a href="/wallet">钱包</a>
+          <a href="/dashboard">控制台</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="wrap main">
+      <div class="section-head">
+        <h1 class="section-title">选择充值额度</h1>
+        <p class="plans-note">
+          实付¥500及以上可开发票，并且赠送全套学术skill，
+          <button class="service-link" type="button">
+            添加客服领取
+            <span class="service-qr" aria-hidden="true">
+              <img src="/beiapi-assets/wechat-community.png" alt="" />
+            </span>
+          </button>
+        </p>
+      </div>
+
+      <div id="status" class="status" role="status"></div>
+
+      <section id="plans" class="plans" aria-label="充值套餐"></section>
+    </main>
+
+    <script>
+      const state = {
+        price: 0.5,
+        paymentMethod: "alipay",
+        paymentMethodName: "支付宝",
+        paying: false,
+        user: null,
+      };
+
+      const packages = [
+        { title: "轻量包", money: 5, amount: 10 },
+        { title: "标准包", money: 10, amount: 20 },
+        { title: "进阶包", money: 50, amount: 100 },
+        { title: "专业包", money: 100, amount: 220, tag: "推荐", featured: true },
+        { title: "团队包", money: 200, amount: 450 },
+        { title: "旗舰包", money: 500, amount: 1200 },
+      ];
+
+      const $ = (id) => document.getElementById(id);
+      const money = (value) => `¥${Number(value).toFixed(2)}`;
+      const amountText = (value) => Number(value).toLocaleString("zh-CN");
+      const walletText = (value) => `$${amountText(value)}`;
+
+      function headers() {
+        const out = { "Content-Type": "application/json" };
+        try {
+          const uid = localStorage.getItem("uid");
+          if (uid) out["New-Api-User"] = uid;
+        } catch {}
+        return out;
+      }
+
+      function setStatus(text, kind = "") {
+        const el = $("status");
+        el.textContent = text || "";
+        el.className = `status ${kind}`.trim();
+      }
+
+      async function api(path, options = {}) {
+        const response = await fetch(path, {
+          credentials: "include",
+          headers: headers(),
+          ...options,
+        });
+        let payload = {};
+        try {
+          payload = await response.json();
+        } catch {}
+        if (!response.ok) {
+          const message = payload.message || `请求失败：${response.status}`;
+          const error = new Error(message);
+          error.status = response.status;
+          throw error;
+        }
+        return payload;
+      }
+
+      function parsePaymentMethods(data) {
+        const raw = data.PayMethods || data.pay_methods || data.payMethods;
+        if (!raw) return;
+        const methods = typeof raw === "string" ? JSON.parse(raw) : raw;
+        if (Array.isArray(methods) && methods.length > 0) {
+          const method = methods[0];
+          state.paymentMethod = method.type || state.paymentMethod;
+          state.paymentMethodName = method.name || state.paymentMethodName;
+        }
+      }
+
+      async function loadStatus() {
+        const payload = await api("/api/status");
+        const data = payload.data || {};
+        state.price = Number(data.price || state.price);
+        parsePaymentMethods(data);
+
+        renderPlans();
+      }
+
+      async function loadUser() {
+        try {
+          const payload = await api("/api/user/self");
+          if (payload.success && payload.data) {
+            state.user = payload.data;
+          }
+        } catch (_) {
+          state.user = null;
+        }
+      }
+
+      function renderPlans() {
+        $("plans").innerHTML = packages
+          .map((item) => {
+            const payMoney = item.money;
+            const amount = item.amount;
+            return `<article class="plan ${item.featured ? "plan-featured" : ""}">
+              ${item.tag ? `<span class="tag">${item.tag}</span>` : ""}
+              <h3>${item.title}</h3>
+              <div class="pay-price">${money(payMoney)}<span>实付</span></div>
+              <div class="metrics">
+                <div class="metric"><span>充值额度 <strong class="amount-strong">${walletText(amount)}</strong></span></div>
+              </div>
+              <button class="btn ${item.featured ? "btn-primary" : "btn-outline"}" type="button" data-pay="${payMoney}" data-amount="${amount}">立即购买</button>
+            </article>`;
+          })
+          .join("");
+      }
+
+      function paymentUrlFrom(payload) {
+        const direct = [
+          payload.url,
+          payload.pay_url,
+          payload.payUrl,
+          payload.payment_url,
+          payload.paymentUrl,
+          payload.redirect_url,
+          payload.redirectUrl,
+        ];
+        const data = payload.data;
+        if (typeof data === "string") direct.push(data);
+        if (data && typeof data === "object") {
+          direct.push(
+            data.url,
+            data.pay_url,
+            data.payUrl,
+            data.payment_url,
+            data.paymentUrl,
+            data.redirect_url,
+            data.redirectUrl,
+            data.link,
+            data.href,
+          );
+        }
+        return direct.find((value) => typeof value === "string" && /^https?:\/\//.test(value));
+      }
+
+      function paymentParamsFrom(payload) {
+        const params = payload.data && typeof payload.data === "object" ? payload.data : null;
+        return params && !Array.isArray(params) ? params : null;
+      }
+
+      function isSuccess(payload) {
+        return payload.success === true || payload.message === "success";
+      }
+
+      function submitPayment(payload) {
+        const url = paymentUrlFrom(payload);
+        if (!url) throw new Error("支付链接为空");
+        const params = paymentParamsFrom(payload);
+
+        if (!params) {
+          location.href = url;
+          return;
+        }
+
+        const form = document.createElement("form");
+        form.action = url;
+        form.method = "POST";
+        form.style.display = "none";
+        Object.entries(params).forEach(([name, value]) => {
+          if (value === undefined || value === null) return;
+          const input = document.createElement("input");
+          input.type = "hidden";
+          input.name = name;
+          input.value = String(value);
+          form.appendChild(input);
+        });
+        document.body.appendChild(form);
+        HTMLFormElement.prototype.submit.call(form);
+        setTimeout(() => form.remove(), 1000);
+      }
+
+      function setPaying(button, paying) {
+        state.paying = paying;
+        document.querySelectorAll("[data-pay]").forEach((item) => {
+          item.disabled = paying;
+        });
+        if (button) button.textContent = paying ? "正在跳转" : "立即购买";
+      }
+
+      function resetPaying() {
+        state.paying = false;
+        document.querySelectorAll("[data-pay]").forEach((item) => {
+          item.disabled = false;
+          item.textContent = "立即购买";
+        });
+      }
+
+      async function pay(pay, amount, button) {
+        if (state.paying) return;
+        const payMoney = Number(pay || 0);
+        const walletAmount = Number(amount || 0);
+        if (!state.user) {
+          location.href = "/sign-in?redirect=%2Fplans";
+          return;
+        }
+        if (!Number.isFinite(payMoney) || payMoney <= 0 || !Number.isFinite(walletAmount) || walletAmount <= 0) {
+          setStatus("请选择有效套餐", "error");
+          return;
+        }
+        setStatus(`正在创建订单：${money(payMoney)}，充值额度 ${walletText(walletAmount)}`);
+        setPaying(button, true);
+        try {
+          const payload = await api("/api/user/pay", {
+            method: "POST",
+            body: JSON.stringify({ amount: walletAmount, payment_method: state.paymentMethod }),
+          });
+          if (!isSuccess(payload)) throw new Error(payload.message || "创建订单失败");
+          setStatus("订单已创建，正在跳转支付", "ok");
+          submitPayment(payload);
+        } catch (error) {
+          setPaying(button, false);
+          if (error.status === 401) {
+            location.href = "/sign-in?redirect=%2Fplans";
+            return;
+          }
+          setStatus(`跳转失败：${error.message || "创建订单失败"}`, "error");
+        }
+      }
+
+      document.addEventListener("click", (event) => {
+        const button = event.target.closest("[data-pay]");
+        if (button) pay(button.dataset.pay, button.dataset.amount, button);
+      });
+
+      window.addEventListener("pageshow", resetPaying);
+
+      loadStatus()
+        .then(loadUser)
+        .then(() => setStatus(""))
+        .catch((error) => setStatus(error.message || "读取配置失败", "error"));
+    </script>
+  </body>
+</html>

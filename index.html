@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>小北科研API — Claude 与 GPT API 中转站</title>
+  <link rel="icon" href="assets/icon.png">
+  <style>
+    /* ── Tokens ── */
+    :root {
+      --bg:        oklch(97.2% 0.008 62);
+      --bg-2:      oklch(94%   0.011 62);
+      --bg-3:      oklch(90%   0.013 62);
+      --ink:       oklch(16%   0.014 52);
+      --ink-2:     oklch(43%   0.010 55);
+      --ink-3:     oklch(60%   0.009 58);
+      --line:      oklch(87%   0.012 62);
+      --accent:    oklch(50%   0.198 27);
+      --accent-hi: oklch(44%   0.180 27);
+      --accent-bg: oklch(95.5% 0.036 27);
+
+      --serif: "Songti SC","STSong","SimSun","AR PL UMing CN",Georgia,"Times New Roman",serif;
+      --sans:  -apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+      --mono:  ui-monospace,"SF Mono",Menlo,"Cascadia Code",Consolas,monospace;
+
+      --max: 1100px;
+      --r:   5px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg:        oklch(12%   0.012 52);
+        --bg-2:      oklch(17.5% 0.015 52);
+        --bg-3:      oklch(22%   0.016 52);
+        --ink:       oklch(94%   0.008 62);
+        --ink-2:     oklch(68%   0.010 60);
+        --ink-3:     oklch(48%   0.010 58);
+        --line:      oklch(27%   0.015 52);
+        --accent:    oklch(63%   0.198 27);
+        --accent-hi: oklch(70%   0.180 27);
+        --accent-bg: oklch(20%   0.038 27);
+      }
+    }
+
+    /* ── Reset ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; overflow-x: hidden; }
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: 16px;
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+      overflow-x: hidden;
+    }
+    body.modal-open { overflow: hidden; }
+    a { color: inherit; text-decoration: none; }
+    img { display: block; max-width: 100%; }
+
+    /* 防止 grid 子项撑宽容器 */
+    .hero-inner > *,
+    .routing-inner > *,
+    .trust-inner > *,
+    .pricing-inner > * { min-width: 0; }
+
+    /* ── Layout ── */
+    .wrap {
+      width: min(var(--max), 100% - 48px);
+      margin-inline: auto;
+    }
+
+    /* ── Shared type ── */
+    .kicker {
+      display: inline-block;
+      margin-bottom: 16px;
+      color: var(--accent);
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+    .section-title {
+      font-family: var(--serif);
+      font-size: clamp(30px, 4vw, 52px);
+      line-height: 1.16;
+      font-weight: 700;
+    }
+    .section-body {
+      margin-top: 18px;
+      color: var(--ink-2);
+      font-size: clamp(15px, 1.5vw, 17px);
+      line-height: 1.85;
+      max-width: 580px;
+    }
+
+    /* ── Buttons ── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 0 20px;
+      border: 1.5px solid transparent;
+      border-radius: var(--r);
+      font-family: var(--sans);
+      font-size: 14px;
+      font-weight: 600;
+      white-space: nowrap;
+      transition: transform 150ms ease, box-shadow 150ms ease, background 150ms ease, border-color 150ms ease;
+      cursor: pointer;
+      background: none;
+    }
+    .btn-primary  { background: var(--ink);  color: var(--bg);   border-color: var(--ink); }
+    .btn-outline  { border-color: var(--line); color: var(--ink); }
+    .btn-tinted   { background: var(--accent-bg); color: var(--accent); }
+    .btn:hover    { transform: translateY(-1px); box-shadow: 0 6px 18px oklch(0% 0 0 / 0.10); }
+    @media (prefers-color-scheme: dark) {
+      .btn:hover  { box-shadow: 0 6px 18px oklch(0% 0 0 / 0.28); }
+    }
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 30px;
+      align-items: center;
+    }
+
+    /* ── Reveal ── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 580ms ease, transform 580ms ease;
+    }
+    .reveal.visible { opacity: 1; transform: none; }
+    @media (prefers-reduced-motion: reduce) {
+      .reveal { opacity: 1; transform: none; transition: none; }
+    }
+
+    /* ══════════════════════════════
+       HERO
+    ══════════════════════════════ */
+    .hero {
+      min-height: 100svh;
+      display: flex;
+      align-items: center;
+      padding-block: 80px 96px;
+      border-bottom: 1px solid var(--line);
+    }
+    .hero-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 64px;
+      align-items: center;
+    }
+
+    .hero-brand {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      margin-bottom: 32px;
+    }
+    .hero-brand img {
+      width: 30px;
+      height: 30px;
+      border-radius: 7px;
+      object-fit: cover;
+    }
+    .hero-brand-name {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--ink-2);
+      letter-spacing: 0.03em;
+    }
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      margin-bottom: 18px;
+      padding: 4px 10px;
+      background: var(--accent-bg);
+      border-radius: 4px;
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+
+    .hero-h1 {
+      font-family: var(--serif);
+      font-size: clamp(54px, 7.8vw, 96px);
+      line-height: 1.02;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      margin-bottom: 22px;
+    }
+
+    .hero-copy {
+      color: var(--ink-2);
+      font-size: clamp(15px, 1.5vw, 17px);
+      line-height: 1.85;
+      max-width: 500px;
+      margin-bottom: 22px;
+    }
+
+    .hero-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      list-style: none;
+      margin-bottom: 0;
+    }
+    .hero-tags li {
+      padding: 4px 11px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--ink-2);
+      font-size: 13px;
+    }
+
+    /* Code card */
+    .code-card {
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      overflow: hidden;
+      background: var(--bg-2);
+      box-shadow: 0 16px 56px oklch(0% 0 0 / 0.07);
+    }
+    @media (prefers-color-scheme: dark) {
+      .code-card { box-shadow: 0 16px 56px oklch(0% 0 0 / 0.30); }
+    }
+    .code-card-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--line);
+      background: var(--bg);
+    }
+    .win-dots {
+      display: flex;
+      gap: 5px;
+    }
+    .win-dots span {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--line);
+    }
+    .code-filename {
+      font-family: var(--mono);
+      font-size: 11.5px;
+      color: var(--ink-3);
+    }
+    .code-body {
+      padding: 20px 20px 18px;
+      font-family: var(--mono);
+      font-size: 13px;
+      line-height: 1.95;
+      color: var(--ink);
+      overflow-x: auto;
+    }
+    .tok-key     { color: var(--accent); }
+    .tok-val     { color: var(--ink); }
+    .tok-comment { color: var(--ink-3); }
+    .tok-cmd     { color: var(--ink-2); }
+
+    .code-card-foot {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 10px 16px;
+      border-top: 1px solid var(--line);
+      color: var(--ink-2);
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .dot-green {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: oklch(62% 0.18 145);
+      box-shadow: 0 0 0 3px oklch(62% 0.18 145 / 0.18);
+      flex-shrink: 0;
+    }
+
+    .hero-meta {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .meta-pill {
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: var(--bg);
+    }
+    .meta-pill strong {
+      display: block;
+      font-size: 12.5px;
+      font-weight: 700;
+      margin-bottom: 3px;
+    }
+    .meta-pill span {
+      font-size: 11.5px;
+      color: var(--ink-3);
+      line-height: 1.5;
+    }
+
+    /* ══════════════════════════════
+       ROUTING
+    ══════════════════════════════ */
+    .routing {
+      padding-block: 96px;
+      background: var(--bg-2);
+      border-bottom: 1px solid var(--line);
+    }
+    .routing-inner {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 80px;
+      align-items: center;
+    }
+
+    /* SVG diagram colours via CSS (inline SVG inherits) */
+    .hub-node    { fill: var(--bg); stroke: var(--line); stroke-width: 1; }
+    .hub-line    { stroke: var(--line); stroke-width: 1.5; fill: none; }
+    .hub-text    { fill: var(--ink); font-family: -apple-system, "PingFang SC", sans-serif; }
+    .hub-sub     { fill: var(--ink-3); }
+    .hub-center  { fill: var(--accent); }
+    .hub-ctxt    { fill: oklch(100% 0 0); }
+
+    /* ══════════════════════════════
+       PROCESS
+    ══════════════════════════════ */
+    .process {
+      padding-block: 96px;
+      border-bottom: 1px solid var(--line);
+    }
+    .process-head {
+      max-width: 660px;
+      margin-bottom: 56px;
+    }
+
+    .steps { display: grid; }
+    .step {
+      display: grid;
+      grid-template-columns: 72px 240px 1fr;
+      gap: 0 36px;
+      align-items: baseline;
+      padding-block: 32px;
+      border-top: 1px solid var(--line);
+    }
+    .step:last-child { border-bottom: 1px solid var(--line); }
+    .step-num {
+      font-family: var(--serif);
+      font-size: 34px;
+      font-weight: 700;
+      color: var(--accent);
+      line-height: 1;
+    }
+    .step-title {
+      font-family: var(--serif);
+      font-size: 19px;
+      font-weight: 700;
+      line-height: 1.35;
+    }
+    .step-body {
+      color: var(--ink-2);
+      font-size: 15px;
+      line-height: 1.8;
+    }
+
+    /* ══════════════════════════════
+       TRUST
+    ══════════════════════════════ */
+    .trust {
+      padding-block: 96px;
+      background: oklch(13.5% 0.016 52);
+      border-bottom: 1px solid oklch(22% 0.016 52);
+    }
+    @media (prefers-color-scheme: dark) {
+      .trust { background: oklch(8.5% 0.013 52); border-bottom-color: oklch(16% 0.014 52); }
+    }
+    .trust-inner {
+      display: grid;
+      grid-template-columns: 0.85fr 1.15fr;
+      gap: 80px;
+      align-items: start;
+    }
+    .trust .kicker     { color: var(--accent); }
+    .trust .section-title { color: oklch(94% 0.008 62); }
+
+    .trust-panel { padding-top: 4px; }
+    .trust-quote {
+      color: oklch(78% 0.011 62);
+      font-size: clamp(15px, 1.7vw, 18px);
+      line-height: 1.9;
+      padding-bottom: 36px;
+      margin-bottom: 36px;
+      border-bottom: 1px solid oklch(24% 0.016 52);
+    }
+    .trust-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+    .metric { padding-top: 18px; border-top: 1.5px solid oklch(30% 0.018 27); }
+    .metric-val {
+      display: block;
+      font-family: var(--serif);
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--accent);
+      line-height: 1;
+      margin-bottom: 7px;
+    }
+    @media (prefers-color-scheme: dark) {
+      .metric-val { color: oklch(65% 0.18 27); }
+    }
+    .metric-lbl { display: block; font-size: 12.5px; color: oklch(58% 0.010 60); line-height: 1.6; }
+
+    /* ══════════════════════════════
+       PRICING
+    ══════════════════════════════ */
+    .pricing {
+      padding-block: 96px;
+      border-bottom: 1px solid var(--line);
+    }
+    .pricing-inner {
+      display: grid;
+      grid-template-columns: 0.9fr 1.1fr;
+      gap: 80px;
+      align-items: start;
+    }
+
+    .price-list {
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      overflow: hidden;
+    }
+    .price-tier {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 16px;
+      align-items: center;
+      padding: 22px 24px;
+      border-bottom: 1px solid var(--line);
+    }
+    .price-tier:last-child { border-bottom: 0; }
+    .price-name {
+      font-family: var(--serif);
+      font-size: 17px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .price-desc { color: var(--ink-2); font-size: 13.5px; line-height: 1.6; }
+    .price-note {
+      margin-top: 18px;
+      color: var(--ink-2);
+      font-size: 14px;
+      line-height: 1.8;
+    }
+    .price-facts {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--line);
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      overflow: hidden;
+      margin-bottom: 14px;
+    }
+    .price-fact {
+      background: var(--bg);
+      padding: 18px;
+    }
+    .price-fact strong {
+      display: block;
+      font-family: var(--serif);
+      font-size: clamp(22px, 3vw, 30px);
+      font-weight: 700;
+      color: var(--accent);
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+    .price-fact span {
+      display: block;
+      color: var(--ink-2);
+      font-size: 12.5px;
+      line-height: 1.55;
+    }
+    .price-badge {
+      padding: 7px 13px;
+      border-radius: var(--r);
+      font-size: 12.5px;
+      font-weight: 700;
+      white-space: nowrap;
+      text-align: center;
+      border: 1.5px solid transparent;
+    }
+    button.price-badge {
+      font-family: var(--sans);
+      background: none;
+      cursor: pointer;
+    }
+    .pb-link    { background: var(--ink); color: var(--bg); }
+    .pb-rec     { background: var(--accent-bg); color: var(--accent); border-color: oklch(from var(--accent) l c h / 0.3); }
+    .pb-consult { border-color: var(--line); color: var(--ink-2); }
+
+    /* ══════════════════════════════
+       FINAL CTA
+    ══════════════════════════════ */
+    .final-cta {
+      padding-block: 112px;
+      text-align: center;
+      background: var(--bg-2);
+    }
+    .final-cta .section-title,
+    .final-cta .section-body { margin-inline: auto; }
+    .final-cta .btn-row { justify-content: center; }
+
+    /* ══════════════════════════════
+       FOOTER
+    ══════════════════════════════ */
+    .site-footer {
+      padding-block: 32px;
+      border-top: 1px solid var(--line);
+    }
+    .footer-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .footer-brand img { width: 20px; height: 20px; border-radius: 5px; object-fit: cover; }
+    .footer-brand span { font-size: 13px; font-weight: 600; color: var(--ink-2); }
+    .footer-copy { font-size: 12px; color: var(--ink-3); }
+
+    /* ══════════════════════════════
+       MODAL
+    ══════════════════════════════ */
+    .modal {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 220ms ease, visibility 220ms ease;
+    }
+    .modal.open {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+    .modal-backdrop {
+      position: absolute;
+      inset: 0;
+      background: oklch(0% 0 0 / 0.52);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: none;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+    }
+    .modal-panel {
+      position: relative;
+      width: min(500px, 100% - 32px);
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      overflow: hidden;
+      box-shadow: 0 28px 90px oklch(0% 0 0 / 0.22);
+      transform: translateY(14px) scale(0.97);
+      transition: transform 280ms cubic-bezier(0.16, 1, 0.3, 1), opacity 220ms ease;
+      opacity: 0;
+    }
+    @media (prefers-color-scheme: dark) {
+      .modal-panel { box-shadow: 0 28px 90px oklch(0% 0 0 / 0.45); }
+    }
+    .modal.open .modal-panel { transform: none; opacity: 1; }
+
+    .modal-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 20px 22px 15px;
+      border-bottom: 1px solid var(--line);
+    }
+    .modal-title {
+      font-family: var(--serif);
+      font-size: 19px;
+      font-weight: 700;
+      margin-top: 4px;
+    }
+    .modal-subtitle {
+      margin-top: 5px;
+      font-size: 13px;
+      color: var(--ink-2);
+      line-height: 1.65;
+    }
+    .modal-close {
+      width: 32px;
+      height: 32px;
+      flex-shrink: 0;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      background: var(--bg);
+      color: var(--ink);
+      font-size: 17px;
+      line-height: 1;
+      transition: background 140ms ease;
+    }
+    .modal-close:hover { background: var(--bg-2); }
+
+    .modal-body { padding: 16px; }
+    .modal-img-frame {
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      overflow: hidden;
+      background: var(--bg-2);
+      min-height: 240px;
+      display: grid;
+      place-items: center;
+    }
+    .modal-img { width: 100%; max-height: 440px; object-fit: contain; }
+    .modal-fallback {
+      display: none;
+      padding: 28px 20px;
+      text-align: center;
+      color: var(--ink-2);
+      font-size: 14px;
+      line-height: 1.75;
+    }
+    .modal-img-frame.err .modal-img     { display: none; }
+    .modal-img-frame.err .modal-fallback { display: block; }
+
+    /* ══════════════════════════════
+       RESPONSIVE
+    ══════════════════════════════ */
+    @media (max-width: 920px) {
+      .hero { min-height: auto; padding-block: 64px 80px; }
+      .hero-inner,
+      .routing-inner,
+      .trust-inner,
+      .pricing-inner { grid-template-columns: 1fr; gap: 48px; }
+      .step { grid-template-columns: 60px 200px 1fr; gap: 0 28px; }
+    }
+
+    @media (max-width: 640px) {
+      .wrap { width: calc(100% - 32px); }
+      .step {
+        grid-template-columns: 52px 1fr;
+        grid-template-rows: auto auto;
+        row-gap: 4px;
+        padding-block: 26px;
+      }
+      .step-body { grid-column: 2; }
+      .step-num { font-size: 26px; }
+      .trust-metrics { grid-template-columns: 1fr; }
+      .price-facts { grid-template-columns: 1fr; }
+      .price-tier { grid-template-columns: 1fr; }
+      .hero-meta { grid-template-columns: 1fr; }
+      .footer-inner { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══ HERO ══ -->
+<section class="hero" aria-labelledby="hero-title">
+  <div class="wrap hero-inner">
+
+    <div>
+      <p class="hero-eyebrow">Claude 与 GPT API 中转站</p>
+      <h1 class="hero-h1" id="hero-title">小北<br>科研API</h1>
+      <p class="hero-copy">为研究生、博士生和科研工作者准备的 AI API 中转：支持 Claude 和 ChatGPT。百分百满血、不降智、稳定高速，适合科研写作、代码、数据分析和文献处理。</p>
+      <ul class="hero-tags" aria-label="核心特点">
+        <li>满血模型能力</li>
+        <li>稳定高速转发</li>
+        <li>科研工作流友好</li>
+      </ul>
+      <div class="btn-row">
+        <a class="btn btn-primary" href="https://beiapi.cn/sign-in">立即接入</a>
+        <a class="btn btn-outline" href="https://pay.ldxp.cn/shop/xiaobeiapi">查看套餐</a>
+        <button class="btn btn-tinted" data-open-modal aria-haspopup="dialog" aria-controls="community-modal">加入社群</button>
+      </div>
+    </div>
+
+    <div aria-label="接入配置示例">
+      <div class="code-card">
+        <div class="code-card-bar">
+          <div class="win-dots" aria-hidden="true">
+            <span></span><span></span><span></span>
+          </div>
+          <span class="code-filename">~/.bashrc 或环境变量</span>
+        </div>
+        <pre class="code-body"><code><span class="tok-comment"># 将 Claude Code 接入小北 API</span>
+<span class="tok-key">export</span> ANTHROPIC_BASE_URL=<span class="tok-val">"https://api.beiapi.cn/v1"</span>
+<span class="tok-key">export</span> ANTHROPIC_API_KEY=<span class="tok-val">"sk-xb-..."</span>
+
+<span class="tok-comment"># 验证连通性</span>
+<span class="tok-cmd">claude --version</span></code></pre>
+        <div class="code-card-foot">
+          <span class="dot-green" aria-hidden="true"></span>
+          Claude / ChatGPT · 满血 · 稳定转发
+        </div>
+      </div>
+      <div class="hero-meta" aria-hidden="true">
+        <div class="meta-pill">
+          <strong>兼容工具</strong>
+          <span>Claude Code · ChatGPT Codex · VS Code · JetBrains · 脚本</span>
+        </div>
+        <div class="meta-pill">
+          <strong>支持模型</strong>
+          <span>Claude 系列 · ChatGPT 系列 · 持续更新</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══ ROUTING ══ -->
+<section class="routing reveal" id="routing" aria-labelledby="routing-title">
+  <div class="wrap routing-inner">
+    <div>
+      <p class="kicker">API Routing</p>
+      <h2 class="section-title" id="routing-title">把 Claude 和 ChatGPT 接入科研里的每一个高频场景。</h2>
+      <p class="section-body">不改变你的工具习惯，只把模型入口整理成稳定、清晰、可复用的一层。写论文、跑代码、读文献、做数据分析，都可以从同一套 API 配置开始。</p>
+    </div>
+
+    <svg viewBox="0 0 340 310" fill="none" xmlns="http://www.w3.org/2000/svg"
+         aria-hidden="true" style="width:100%;max-width:360px;margin:0 auto;display:block;">
+      <!-- connector lines -->
+      <line class="hub-line" x1="124" y1="44"  x2="162" y2="142"/>
+      <line class="hub-line" x1="270" y1="90"  x2="192" y2="146"/>
+      <line class="hub-line" x1="270" y1="220" x2="192" y2="164"/>
+      <line class="hub-line" x1="124" y1="266" x2="162" y2="168"/>
+      <!-- nodes -->
+      <rect class="hub-node" x="10"  y="20"  width="114" height="48" rx="4"/>
+      <text class="hub-text" x="67"  y="40"  text-anchor="middle" font-size="12" font-weight="600">Claude / ChatGPT</text>
+      <text class="hub-text hub-sub" x="67" y="56" text-anchor="middle" font-size="10.5">Codex · IDE · 脚本</text>
+
+      <rect class="hub-node" x="216" y="64"  width="114" height="48" rx="4"/>
+      <text class="hub-text" x="273" y="84"  text-anchor="middle" font-size="12" font-weight="600">论文写作</text>
+      <text class="hub-text hub-sub" x="273" y="100" text-anchor="middle" font-size="10.5">润色 · 结构 · 投稿</text>
+
+      <rect class="hub-node" x="216" y="198" width="114" height="48" rx="4"/>
+      <text class="hub-text" x="273" y="218" text-anchor="middle" font-size="12" font-weight="600">代码实验</text>
+      <text class="hub-text hub-sub" x="273" y="234" text-anchor="middle" font-size="10.5">调试 · 重构 · 工程化</text>
+
+      <rect class="hub-node" x="10"  y="242" width="114" height="48" rx="4"/>
+      <text class="hub-text" x="67"  y="262" text-anchor="middle" font-size="12" font-weight="600">文献处理</text>
+      <text class="hub-text hub-sub" x="67" y="278" text-anchor="middle" font-size="10.5">阅读 · 归纳 · 分析</text>
+
+      <!-- center hub -->
+      <rect class="hub-center" x="138" y="128" width="64" height="54" rx="5"/>
+      <text class="hub-ctxt" x="170" y="149" text-anchor="middle" font-size="11.5" font-weight="700">小北</text>
+      <text class="hub-ctxt" x="170" y="165" text-anchor="middle" font-size="11.5" font-weight="700">科研API</text>
+    </svg>
+  </div>
+</section>
+
+<!-- ══ PROCESS ══ -->
+<section class="process reveal" id="process" aria-labelledby="process-title">
+  <div class="wrap">
+    <div class="process-head">
+      <p class="kicker">Process</p>
+      <h2 class="section-title" id="process-title">从接入到使用，尽量少打扰你的科研节奏。</h2>
+      <p class="section-body">重点不是多一个平台，而是让 AI 能自然进入论文、代码和数据工作流。</p>
+    </div>
+    <div class="steps">
+      <article class="step">
+        <span class="step-num" aria-hidden="true">01</span>
+        <h3 class="step-title">获取接入方式</h3>
+        <p class="step-body">按指引配置 Claude 或 ChatGPT API，让常用工具快速连上中转站。</p>
+      </article>
+      <article class="step">
+        <span class="step-num" aria-hidden="true">02</span>
+        <h3 class="step-title">保持满血能力</h3>
+        <p class="step-body">面向科研长文本、代码推理和文献整理，强调不降智的使用体验。</p>
+      </article>
+      <article class="step">
+        <span class="step-num" aria-hidden="true">03</span>
+        <h3 class="step-title">覆盖科研任务</h3>
+        <p class="step-body">写作润色、代码调试、数据分析、文献处理都从同一个 API 入口走。</p>
+      </article>
+      <article class="step">
+        <span class="step-num" aria-hidden="true">04</span>
+        <h3 class="step-title">社群持续更新</h3>
+        <p class="step-body">围绕研究生和博士常见问题，持续分享 AI 科研流程和实操经验。</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ══ TRUST ══ -->
+<section class="trust reveal" id="trust" aria-labelledby="trust-title">
+  <div class="wrap trust-inner">
+    <div>
+      <p class="kicker">Creator Trust</p>
+      <h2 class="section-title" id="trust-title">长期做 AI 科研内容的人，来做科研用户的 API 入口。</h2>
+    </div>
+    <div class="trust-panel">
+      <p class="trust-quote">小北科研API 全网十多万粉丝，长期做 AI 科研相关内容，帮助研究生、博士把 AI 用到论文、代码和科研流程里。</p>
+      <div class="trust-metrics">
+        <div class="metric">
+          <strong class="metric-val">10万+</strong>
+          <span class="metric-lbl">全网关注者与科研 AI 内容受众</span>
+        </div>
+        <div class="metric">
+          <strong class="metric-val">长期</strong>
+          <span class="metric-lbl">围绕论文、代码、文献与科研流程输出</span>
+        </div>
+        <div class="metric">
+          <strong class="metric-val">垂直</strong>
+          <span class="metric-lbl">服务研究生、博士生和科研工作者</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ PRICING ══ -->
+<section class="pricing reveal" id="pricing" aria-labelledby="pricing-title">
+  <div class="wrap pricing-inner">
+    <div>
+      <p class="kicker">Pricing</p>
+      <h2 class="section-title" id="pricing-title">缓存命中后，科研 API 成本会明显降下来。</h2>
+      <p class="section-body">我们的缓存命中率高达 90%，命中缓存的部分仅按原价 1 折收费。正常使用情况下，0.5 RMB = 1 美金 = 约 300 万 GPT-5.5 Token。</p>
+      <div class="btn-row">
+        <a class="btn btn-primary" href="https://beiapi.cn/sign-in">立即接入</a>
+        <a class="btn btn-outline" href="https://pay.ldxp.cn/shop/xiaobeiapi">购买套餐</a>
+        <button class="btn btn-tinted" data-open-modal aria-haspopup="dialog" aria-controls="community-modal">加入社群</button>
+      </div>
+    </div>
+    <div>
+      <div class="price-facts" aria-label="价格优势">
+        <div class="price-fact">
+          <strong>90%</strong>
+          <span>缓存命中率高，重复上下文和高频任务更省。</span>
+        </div>
+        <div class="price-fact">
+          <strong>1 折</strong>
+          <span>命中缓存的 Token 仅按原价十分之一计费。</span>
+        </div>
+        <div class="price-fact">
+          <strong>300 万</strong>
+          <span>正常使用下，0.5 RMB 约等于 300 万 GPT-5.5 Token。</span>
+        </div>
+      </div>
+      <div class="price-list">
+        <div class="price-tier">
+          <div>
+            <p class="price-name">入门体验</p>
+            <p class="price-desc">适合先测试 Claude / ChatGPT API 接入、验证速度与稳定性。</p>
+          </div>
+          <a class="price-badge pb-link" href="https://pay.ldxp.cn/shop/xiaobeiapi">查看套餐</a>
+        </div>
+        <div class="price-tier">
+          <div>
+            <p class="price-name">科研高频</p>
+            <p class="price-desc">适合日常论文写作、代码调试、文献处理等持续任务。</p>
+          </div>
+          <span class="price-badge pb-rec">推荐</span>
+        </div>
+        <div class="price-tier">
+          <div>
+            <p class="price-name">团队协作</p>
+            <p class="price-desc">适合课题组、实验室或多项目并行的 API 使用需求。</p>
+          </div>
+          <button class="price-badge pb-consult" data-open-modal aria-haspopup="dialog" aria-controls="community-modal">咨询</button>
+        </div>
+      </div>
+      <p class="price-note">实际消耗会随模型、上下文长度、缓存命中情况和任务类型变化，充值前可先小额测试。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FINAL CTA ══ -->
+<section class="final-cta reveal" id="access" aria-labelledby="final-title">
+  <div class="wrap">
+    <p class="kicker">开始使用</p>
+    <h2 class="section-title" id="final-title">让 Claude 和 ChatGPT 真正进入你的科研生产力系统。</h2>
+    <p class="section-body">从一个稳定高速的 API 中转站开始，把写作、代码、数据分析和文献处理接到同一条工作流里。</p>
+    <div class="btn-row">
+      <a class="btn btn-primary" href="https://beiapi.cn/sign-in">立即接入</a>
+      <a class="btn btn-outline" href="https://pay.ldxp.cn/shop/xiaobeiapi">查看套餐</a>
+      <button class="btn btn-tinted" data-open-modal aria-haspopup="dialog" aria-controls="community-modal">加入社群</button>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FOOTER ══ -->
+<footer class="site-footer">
+  <div class="wrap footer-inner">
+    <div class="footer-brand">
+      <img src="assets/icon.png" alt="小北科研API">
+      <span>小北科研API</span>
+    </div>
+    <p class="footer-copy">Claude 与 GPT API 中转站 · 面向科研工作者</p>
+  </div>
+</footer>
+
+<!-- ══ MODAL ══ -->
+<div id="community-modal" class="modal" role="dialog" aria-modal="true"
+     aria-labelledby="modal-title" hidden>
+  <button class="modal-backdrop" type="button" data-close-modal aria-label="关闭"></button>
+  <div class="modal-panel">
+    <div class="modal-header">
+      <div>
+        <p class="kicker" style="margin-bottom:6px">Community</p>
+        <h2 class="modal-title" id="modal-title">加入小北科研API社群</h2>
+        <p class="modal-subtitle">扫码添加微信，优先添加左侧二维码；如遇添加频繁，可使用右侧备用二维码。</p>
+      </div>
+      <button class="modal-close" type="button" data-close-modal aria-label="关闭">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-img-frame" id="modal-frame">
+        <img class="modal-img" src="assets/wechat-community.png"
+             alt="小北科研API微信社群二维码" id="modal-img">
+        <p class="modal-fallback">
+          请将二维码图片命名为 <code>wechat-community.png</code> 并放入 <code>assets/</code> 文件夹。
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Scroll reveal
+  const obs = new IntersectionObserver(
+    entries => entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); }
+    }),
+    { threshold: 0.11 }
+  );
+  document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+  // Modal
+  const modal  = document.getElementById('community-modal');
+  const mImg   = document.getElementById('modal-img');
+  const mFrame = document.getElementById('modal-frame');
+  let prev = null;
+
+  const openModal = e => {
+    e?.preventDefault();
+    prev = document.activeElement;
+    modal.hidden = false;
+    document.body.classList.add('modal-open');
+    requestAnimationFrame(() => {
+      modal.classList.add('open');
+      modal.querySelector('.modal-close')?.focus({ preventScroll: true });
+    });
+  };
+
+  const closeModal = () => {
+    modal.classList.remove('open');
+    document.body.classList.remove('modal-open');
+    setTimeout(() => { modal.hidden = true; }, 240);
+    prev?.focus({ preventScroll: true });
+  };
+
+  document.querySelectorAll('[data-open-modal]').forEach(el => el.addEventListener('click', openModal));
+  document.querySelectorAll('[data-close-modal]').forEach(el => el.addEventListener('click', closeModal));
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && modal.classList.contains('open')) closeModal();
+  });
+  mImg?.addEventListener('error', () => mFrame?.classList.add('err'));
+</script>
+</body>
+</html>
