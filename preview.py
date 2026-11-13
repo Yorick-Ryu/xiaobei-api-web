@@ -14,6 +14,21 @@ class PreviewHandler(SimpleHTTPRequestHandler):
 
     def do_GET(self):
         path = urlsplit(self.path).path
+        if path == '/beiapi-home/':
+            # Match the production iframe: the homepage hides its own header.
+            page = b'''<!doctype html>
+<html lang="zh-CN"><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BeiAPI local preview</title>
+<style>html,body{margin:0;height:100%;overflow:hidden}iframe{display:block;width:100%;height:100%;border:0}</style>
+<iframe src="/beiapi-home/index.html" title="BeiAPI homepage preview"></iframe>
+</html>'''
+            self.send_response(200)
+            self.send_header('Content-Type', 'text/html; charset=utf-8')
+            self.send_header('Content-Length', str(len(page)))
+            self.end_headers()
+            self.wfile.write(page)
+            return
         if path == '/beiapi-home':
             self.send_response(302)
             self.send_header('Location', '/beiapi-home/')

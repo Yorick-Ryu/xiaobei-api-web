@@ -7,8 +7,24 @@ and the project's `shadcn-ui` conventions.
 
 - Use semantic background, foreground, card, muted, border, primary and ring
   variables. Keep the site's neutral surfaces, blue emphasis, sans-serif font,
-  1rem base radius and subtle borders. Derive tints in OKLab to retain the blue
-  hue; darken light-mode filled actions enough for readable white labels.
+  1rem base radius and subtle borders. Use the console's primary color directly
+  for filled actions and blue emphasis; match its OKLCH accent mixes and
+  80%-opacity primary action hover state.
+- Use the console's radius scale throughout: sm = 0.6, md = 0.8, lg = 1,
+  xl = 1.4, 2xl = 1.8 and 4xl = 2.6 times the base radius. Cards and dialogs use xl,
+  regular controls use lg, badges use 4xl, and compact icon/number tiles use
+  md/sm. Keep the same radius roles on mobile; circles and square dividers
+  retain their geometric shapes.
+- Match the compact PublicHeader for the floating support control: 2xl radius,
+  60% background opacity, 40px backdrop blur, a 0.5px half-opacity border ring
+  and its light/dark shadows. Use an opaque surface without backdrop support.
+  Align its right edge with the shared content container, using the same 24px
+  gutter (16px on mobile) and 1200px content width cap.
+- Use Lucide for all UI icons, including close and check marks. The inline SVGs
+  are rendered from the console's installed `lucide-react` v1.25.0 with its
+  default 24px viewBox, 2px stroke and round caps/joins; preserve official paths
+  and the license notice in the HTML. Size icons via CSS and hide decorative
+  SVGs from assistive technology. Keep brand logos and the routing diagram.
 - Keep an 8px spacing rhythm, compact controls, consistent card padding and
   responsive grids. At narrow widths, stack cards and keep essential actions
   visible. Avoid stretching video headings to match adjacent content.

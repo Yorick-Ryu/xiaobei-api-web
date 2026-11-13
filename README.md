@@ -5,8 +5,9 @@ BeiAPI-hosted homepage source is `public/index.html`; root `index.html`,
 `plans.html` and their assets retain the earlier standalone site.
 
 Local preview: run `python3 preview.py` and open
-`http://localhost:8787/beiapi-home/`. It serves the actual public
-files, resolves their same-origin assets, and opens console links in the existing
+`http://localhost:8787/beiapi-home/`. It embeds the actual public page so its
+standalone header stays hidden, as in production, resolves same-origin assets,
+and opens console links in the existing
 local NewAPI at `http://localhost:3001`. It does not change production or database
 homepage settings.
 
