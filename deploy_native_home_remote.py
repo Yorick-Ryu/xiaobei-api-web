@@ -10,6 +10,8 @@ import shutil
 import stat
 import subprocess
 
+from native_frontend_config import native_plans_config
+
 
 def run(*args):
     return subprocess.run(args, check=True, capture_output=True, text=True).stdout.strip()
@@ -29,6 +31,7 @@ def state():
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--expected-config', required=True)
 parser.add_argument('--expected-app-revision', required=True)
+parser.add_argument('--native-plans', action='store_true', help='Switch plans to the native app and retire forced navigation injection')
 args = parser.parse_args()
 source = Path(__file__).resolve().parent
 release = source.parent
@@ -49,7 +52,10 @@ old_response = "        return 200 '{\"success\":true,\"message\":\"\",\"data\":
 new_response = "        return 200 '{\"success\":true,\"message\":\"\",\"data\":\"\"}';"
 assert text.count(old_response) == 1, 'Unexpected homepage response'
 candidate = release / 'nginx-candidate.conf'
-candidate.write_text(text.replace(old_response, new_response))
+candidate_text = text.replace(old_response, new_response)
+if args.native_plans:
+    candidate_text = native_plans_config(candidate_text)
+candidate.write_text(candidate_text)
 backup = release / 'nginx-before.conf'
 assert not backup.exists(), 'Release already applied'
 before = state()
@@ -63,6 +69,12 @@ includes.append(f'include {candidate};')
 test_config = release / 'nginx-test.conf'
 test_config.write_text(main.replace(include, '\n'.join(includes)))
 run('nginx', '-t', '-c', str(test_config))
+# A new compatibility asset leaves the old app and its script untouched.
+if args.native_plans:
+    asset = Path('/usr/share/nginx/html/beiapi-assets/home-frame-scroll.js')
+    assert not asset.exists(), 'Compatibility asset already exists; review before retrying'
+    shutil.copy2(source / 'beiapi-assets/home-frame-scroll.js', asset)
+    os.chmod(asset, 0o644)
 shutil.copy2(site, backup)
 os.chmod(backup, 0o600)
 temporary = site.with_name(site.name + '.' + commit[:12] + '.tmp')
@@ -91,6 +103,7 @@ result = {
     'source_commit': commit,
     'release': str(release),
     'native_homepage': True,
+    'native_plans': args.native_plans,
     'application_revision': args.expected_app_revision,
     'previous_config_sha256': args.expected_config,
     'config_sha256': digest(site),
