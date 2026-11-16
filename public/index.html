@@ -4,7 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>小北科研API — AI 工具与科研支持</title>
-  <link rel="icon" type="image/svg+xml" href="https://beiapi.cn/beiapi-assets/logo-north.svg">
+  <link rel="icon" type="image/svg+xml" href="/beiapi-assets/logo-north.svg">
+  <link rel="preload" as="image" href="/beiapi-home/assets/3af3c5d013189f31.jpg" fetchpriority="high" media="(min-width: 901px)">
   <script>
     // Match the site's theme before paint; the application sends updates when embedded.
     (() => {
@@ -516,7 +517,7 @@ html.modal-open, body.modal-open { overflow: hidden; }
 <body id="top">
 <header class="site-nav" aria-label="网站导航">
   <div class="wrap site-nav-inner">
-    <a class="site-brand" href="#top"><img src="https://beiapi.cn/beiapi-assets/logo-north.svg" alt=""><span>小北科研API</span></a>
+    <a class="site-brand" href="#top"><img src="/beiapi-assets/logo-north.svg" alt="" decoding="async"><span>小北科研API</span></a>
     <nav class="site-nav-links" aria-label="主导航">
       <a href="#top" aria-current="page">主页</a>
       <a href="/dashboard" target="_top">控制台</a>
@@ -932,7 +933,7 @@ html.modal-open, body.modal-open { overflow: hidden; }
 <footer class="site-footer">
   <div class="wrap footer-inner">
     <div class="footer-brand">
-      <img src="https://beiapi.cn/beiapi-assets/logo-north.svg" alt="小北科研API">
+      <img src="/beiapi-assets/logo-north.svg" alt="小北科研API" decoding="async">
       <span>小北科研API</span>
     </div>
     <p class="footer-copy">AI 工具与接入服务 · 面向科研工作者</p>
@@ -999,6 +1000,7 @@ html.modal-open, body.modal-open { overflow: hidden; }
       <p class="support-hint">添加时备注「API 售后」，并附上遇到的问题或报错截图，方便定位处理。优先添加左侧微信；添加频繁时可使用右侧备用微信。</p>
       <div class="modal-img-frame">
         <img class="modal-img" src="/beiapi-home/assets/3a3296fc7db30a31.png"
+             loading="lazy" decoding="async" fetchpriority="low" width="983" height="614"
              alt="小北微信联系二维码">
         <p class="modal-fallback">
           微信二维码暂时未能加载，请刷新页面后重试。
