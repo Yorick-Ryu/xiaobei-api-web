@@ -19,3 +19,11 @@ After the matching NewAPI revision is deployed, the gated
 location and replaces forced navigation injection with `home-frame-scroll.js`.
 The `/plans/` redirect and iframe homepage compatibility remain. Rollback restores the
 previous Nginx configuration and application; standalone HTML files are retained.
+
+Production rollout boundary: remove BeiAPI's fixed `/api/home_page_content` response
+when activating the native frontend, so a configured URL/HTML still wins and an
+empty backend value selects the native homepage. The current native-home switch
+script's fixed-empty response is preparation code and must be adjusted at rollout.
+Keep Novapi's own homepage URL and Dianapi's existing homepage rewrite separate;
+never apply the main-site response change to their vhosts. Both brands must retain
+`plans.enabled=false` through their status configuration rewrites.
