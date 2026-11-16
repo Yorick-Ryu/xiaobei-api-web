@@ -47,12 +47,19 @@ assert site.resolve() == site and site.is_file(), 'Unexpected site configuration
 assert digest(site) == args.expected_config, 'Live site changed'
 original_stat = site.stat()
 text = site.read_text()
-# Match only the existing brand-scoped response; shared database settings stay intact.
-old_response = "        return 200 '{\"success\":true,\"message\":\"\",\"data\":\"https://$host/beiapi-home/\"}';"
-new_response = "        return 200 '{\"success\":true,\"message\":\"\",\"data\":\"\"}';"
+# Remove only BeiAPI's fixed response: the existing general proxy location now
+# serves the backend-configured homepage, including an empty native-home choice.
+old_response = """    location = /api/home_page_content {
+        if ($request_method !~ ^(GET|HEAD)$) { return 405; }
+        default_type application/json;
+        add_header Cache-Control "no-store";
+        return 200 '{"success":true,"message":"","data":"https://$host/beiapi-home/"}';
+    }
+
+"""
 assert text.count(old_response) == 1, 'Unexpected homepage response'
 candidate = release / 'nginx-candidate.conf'
-candidate_text = text.replace(old_response, new_response)
+candidate_text = text.replace(old_response, '')
 if args.native_plans:
     candidate_text = native_plans_config(candidate_text)
 candidate.write_text(candidate_text)
