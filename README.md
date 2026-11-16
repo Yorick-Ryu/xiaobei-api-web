@@ -1,5 +1,20 @@
 # BeiAPI same-origin public homepage
 
+Native `/plans` HTML caching: from a committed archive, run
+`deploy_plans_cache_remote.py --expected-config <live-sha256>` on BeiAPI, then
+`configure_plans.py cache <evidence-directory>` locally. This adds one exact
+main-site location and one scoped SaaS Cache Rule, respecting the origin's
+five-minute TTL. APIs and agent sites are outside the rule. The application is
+not restarted. Rollback locators: `/opt/stacks/beiapi-homepage/last-plans-cache-rollout.json`
+and the evidence directory's `cloudflare-created.json`; restore only after
+checking for later changes, and delete only the recorded rule.
+
+When explicitly authorized, `configure_plans.py require-login <evidence-directory>`
+updates only `HeaderNavModules.plans` to enabled with authentication required,
+preserving other navigation options and saving the previous option for rollback.
+The cached HTML contains only the shared app shell; page access and catalog
+prices still require fresh authenticated API responses.
+
 Repository: <https://github.com/Yorick-Ryu/xiaobei-api-web>. The current
 BeiAPI-hosted homepage source is `public/index.html`; root `index.html`,
 `plans.html` and their assets retain the earlier standalone site.
